@@ -23,7 +23,8 @@ public class Recipe {
 
     }
 
-    public Recipe(int id, int categoryId, String name, String description, int personCount, List<Step> steps) {
+    public Recipe(int id, int categoryId, String name, String description, int personCount,
+            List<Step> steps) {
         this.id = id;
         this.categoryId = categoryId;
         this.name = name;
@@ -80,5 +81,9 @@ public class Recipe {
         this.steps = steps;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
 
 }

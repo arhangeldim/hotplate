@@ -16,15 +16,15 @@ import java.util.Map;
 
 public interface IDatabaseManager {
 
-    Map<Integer, String> getRecipesName(Product ingridient, int categoryId);
+    List<Recipe> getRecipesName(Product ingridient, int categoryId, int limit);
 
-    Map<Integer, String> getRecipesName(Product ingridient);
+    List<Recipe> getRecipesName(Product ingridient, int limit);
 
-    Map<Integer, String> getRecipesName(int categoryId);
+    List<Recipe> getRecipesName(int categoryId, int limit);
 
-    Map<Integer, String> getAllRecipesName();
+    List<Recipe> getAllRecipesName(int limit);
 
-    List<Product> getProductsList(int type);
+    List<Product> getProductsList(int type, int limit);
 
     Recipe getRecipeById(int id);
 
