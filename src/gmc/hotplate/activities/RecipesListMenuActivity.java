@@ -28,14 +28,14 @@ import android.widget.ListView;
 
 public class RecipesListMenuActivity extends Activity {
 
-	public static final int QUERY_LIMIT = 10;
-	private static final String LOG_TAG = "RecipesListMenuActivity";
-	private IDatabaseManager dbManager;
-	private RecipeManager recipeManager;
-	private List<Recipe> recipes;
-	private ListView lvRecipes;
+    public static final int QUERY_LIMIT = 10;
+    private static final String LOG_TAG = "RecipesListMenuActivity";
+    private IDatabaseManager dbManager;
+    private RecipeManager recipeManager;
+    private List<Recipe> recipes;
+    private ListView lvRecipes;
 
-	@Override
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.recipe_list);
@@ -48,34 +48,34 @@ public class RecipesListMenuActivity extends Activity {
         Recipe[] recipesArray = new Recipe[recipes.size()];
         recipes.toArray(recipesArray);
         ArrayAdapter<Recipe> adapter =
-        		new ArrayAdapter<Recipe>(this, android.R.layout.simple_list_item_1,
-        				recipesArray);
+                new ArrayAdapter<Recipe>(this, android.R.layout.simple_list_item_1,
+                        recipesArray);
         lvRecipes.setAdapter(adapter);
         lvRecipes.setOnItemClickListener(new OnItemClickListener() {
 
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
-				Log.d(LOG_TAG, "OnItemClick: id = " + id);
-				Object selected = parent.getAdapter().getItem(position);
-				if (selected instanceof Recipe) {
-					Recipe recipe = (Recipe) selected;
-					Log.d(LOG_TAG, "Selected recipe name: " + recipe.getName());
-					recipeManager.setCurrentRecipe(recipe);
-				}
-				Intent intent = new Intent(RecipesListMenuActivity.this,
-						RecipeDescriptionActivity.class);
-				startActivity(intent);
-			}
-		});
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position,
+                    long id) {
+                Log.d(LOG_TAG, "OnItemClick: id = " + id);
+                Object selected = parent.getAdapter().getItem(position);
+                if (selected instanceof Recipe) {
+                    Recipe recipe = (Recipe) selected;
+                    Log.d(LOG_TAG, "Selected recipe name: " + recipe.getName());
+                    recipeManager.setCurrentRecipe(recipe);
+                }
+                Intent intent = new Intent(RecipesListMenuActivity.this,
+                        RecipeDescriptionActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
-	private void initialize() {
+    private void initialize() {
         recipes = dbManager.getAllRecipesName(QUERY_LIMIT);
         Log.d(LOG_TAG, "Recipe list size = " + recipes.size());
         for (Recipe r : recipes) {
             Log.d(LOG_TAG, "Recipe: id=" + r.getId() + ", name=" + r.getName());
         }
-	}
+    }
 
 }

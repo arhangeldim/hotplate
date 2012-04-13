@@ -9,12 +9,6 @@
 package gmc.hotplate.activities;
 
 import gmc.hotplate.R;
-import gmc.hotplate.entities.Recipe;
-import gmc.hotplate.logic.DatabaseManager;
-import gmc.hotplate.logic.IDatabaseManager;
-
-import java.util.List;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

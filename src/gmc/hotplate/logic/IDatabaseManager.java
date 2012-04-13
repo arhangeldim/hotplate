@@ -12,7 +12,6 @@ import gmc.hotplate.entities.Product;
 import gmc.hotplate.entities.Recipe;
 
 import java.util.List;
-import java.util.Map;
 
 public interface IDatabaseManager {
 
