@@ -12,7 +12,6 @@ import gmc.hotplate.R;
 import gmc.hotplate.entities.Product;
 import gmc.hotplate.entities.Recipe;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -53,12 +52,13 @@ public final class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public List<Recipe> getAllRecipesName(int limit) {
+    public Recipe[] getRecipes(int limit) {
         String[] columns = {"_id", "name", "category_id", "description", "person_count", "steps"};
         Cursor cursor = db.query("recipes", columns, null, null, null, null, null,
                  String.valueOf(limit));
-        Log.d(LOG_TAG, "Cursor size: " + cursor.getCount());
-        List<Recipe> recipes = new ArrayList<Recipe>();
+        int cursorCount = cursor.getCount();
+        Log.d(LOG_TAG, "Cursor size: " + cursorCount);
+        Recipe[] recipes = new Recipe[cursorCount];
         Recipe recipe;
         if (cursor.moveToFirst()) {
             do {
@@ -70,30 +70,13 @@ public final class DatabaseManager implements IDatabaseManager {
                 recipe.setPersonCount(cursor.getInt(cursor.getColumnIndex("person_count")));
                 //TODO(arhangeldim): To get info about steps.
 
-                recipes.add(recipe);
+                recipes[cursor.getPosition()] = recipe;
             } while (cursor.moveToNext());
         }
         return recipes;
     }
 
-    @Override
-    public List<Recipe> getRecipesName(Product ingridient,
-            int categoryId, int limit) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
-    @Override
-    public List<Recipe> getRecipesName(Product ingridient, int limit) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Recipe> getRecipesName(int categoryId, int limit) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public List<Product> getProductsList(int type, int limit) {
@@ -325,6 +308,25 @@ public final class DatabaseManager implements IDatabaseManager {
             Log.d(LOG_TAG, "  Tables created");
         }
 
+    }
+
+
+    @Override
+    public Recipe[] getRecipes(Product ingridient, int categoryId, int limit) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Recipe[] getRecipes(Product ingridient, int limit) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Recipe[] getRecipes(int categoryId, int limit) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

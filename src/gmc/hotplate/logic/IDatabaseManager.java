@@ -15,13 +15,13 @@ import java.util.List;
 
 public interface IDatabaseManager {
 
-    List<Recipe> getRecipesName(Product ingridient, int categoryId, int limit);
+    Recipe[] getRecipes(Product ingridient, int categoryId, int limit);
 
-    List<Recipe> getRecipesName(Product ingridient, int limit);
+    Recipe[] getRecipes(Product ingridient, int limit);
 
-    List<Recipe> getRecipesName(int categoryId, int limit);
+    Recipe[] getRecipes(int categoryId, int limit);
 
-    List<Recipe> getAllRecipesName(int limit);
+    Recipe[] getRecipes(int limit);
 
     List<Product> getProductsList(int type, int limit);
 

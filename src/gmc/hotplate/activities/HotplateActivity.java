@@ -20,20 +20,28 @@ import android.widget.Button;
 public class HotplateActivity extends Activity implements OnClickListener {
 
     private static final String LOG_TAG = "HotplateActivity";
-    private Button btnShowRecipes;
+    private Button btnRecipeList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        btnShowRecipes = (Button) findViewById(R.id.btnRecipeList);
-        btnShowRecipes.setOnClickListener(this);
+        btnRecipeList = (Button) findViewById(R.id.btnRecipeList);
+        btnRecipeList.setOnClickListener(this);
         Log.d(LOG_TAG, "Created HotplateActivity");
     }
 
     @Override
     public void onClick(View v) {
-        Intent intent = new Intent(this, RecipesListMenuActivity.class);
-        startActivity(intent);
+        switch (v.getId()) {
+            case R.id.btnRecipeList:
+                Intent intent = new Intent(this, RecipesListMenuActivity.class);
+                startActivity(intent);
+                break;
+            default:
+                break;
+
+        }
     }
+
 }
