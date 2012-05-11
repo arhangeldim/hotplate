@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Hotplate</string>
+    <string name="db_name">hotplateDB</string>
+    <string name="menu_recipe_label">Список Рецептов</string>
+    <string name="db_version">1</string>
+    <string name="recipe_list_menu_label">Кулинарная книга</string>
+    <string name="btn_start_label">Старт</string>
+</resources>
