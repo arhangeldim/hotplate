@@ -21,9 +21,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class RecipesListMenuActivity extends Activity implements OnItemClickListener {
 
@@ -43,7 +46,7 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
         lvRecipes = (ListView) findViewById(R.id.lvRecipes);
 
         List<Recipe> recipes = dbManager.getRecipes(QUERY_LIMIT);
-        RecipeListAdapter adapter = new RecipeListAdapter(this, recipes);
+        RecipeListAdapter adapter = new RecipeListAdapter(recipes);
         lvRecipes.setAdapter(adapter);
         lvRecipes.setOnItemClickListener(this);
     }
@@ -61,4 +64,61 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
         startActivity(intent);
     }
 
+
+    class RecipeListAdapter extends BaseAdapter {
+    
+        private List<Recipe> recipes;
+    
+        public RecipeListAdapter(List<Recipe> recipes) {
+            this.recipes = recipes;
+        }
+    
+        @Override
+        public int getCount() {
+            return recipes.size();
+        }
+    
+        @Override
+        public Object getItem(int position) {
+            return recipes.get(position);
+        }
+    
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+    
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View item = convertView;
+            RecipeItemHolder holder = null;
+            if (item == null) {
+                item = getLayoutInflater().inflate(
+                        R.layout.recipe_list_item, parent, false);
+                holder = new RecipeItemHolder(item);
+                item.setTag(holder);
+            } else {
+                holder = (RecipeItemHolder) item.getTag();
+            }
+            
+            holder.populateFrom((Recipe)getItem(position));
+            return item;
+        }
+    
+    }
+    
+    static class RecipeItemHolder {
+        private TextView tvName;
+        private TextView tvDescr;
+        
+        RecipeItemHolder(View item) {
+            tvName = (TextView) item.findViewById(R.id.tvName);
+            tvDescr = (TextView) item.findViewById(R.id.tvDescr);
+        }
+        
+        void populateFrom(Recipe recipe) {
+            tvName.setText(recipe.getName());
+            tvDescr.setText(recipe.getDescription());
+        }
+    }
 }
