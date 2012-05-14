@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2012 Hotplate developers. All rights reserved.
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
@@ -31,12 +30,12 @@ import android.widget.TextView;
  *
  */
 public class RecipeDescriptionActivity extends Activity {
-
-    private static final String LOG_TAG = "RecipesDescriptionActivity";
+    private static final String LOG_TAG = RecipeDescriptionActivity.class.getName();
     private RecipeManager recipeManager;
     private TextView tvRecipeName;
     private TextView tvIngredients;
     private ListView lvSteps;
+    private StepListAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,8 +58,14 @@ public class RecipeDescriptionActivity extends Activity {
         tvIngredients.setText(builder.toString());
 
         List<Step> steps = recipeManager.getCurrentRecipe().getSteps();
-        StepListAdapter adapter = new StepListAdapter(steps);
+        adapter = new StepListAdapter(steps);
         lvSteps.setAdapter(adapter);
+        recipeManager.setCurrentActivity(this);
+    }
+    
+    public StepListAdapter getStepListAdapter() {
+        assert adapter != null : "Adapter is null";
+        return adapter;
     }
 
     /*
@@ -71,18 +76,17 @@ public class RecipeDescriptionActivity extends Activity {
 
         private static final String LOG_TAG = "StepListAdapter";
         private List<Step> steps;
+        
 
         // When view is created, set isCreated=true
         // and add view in List views.  List size = number of positions = number of steps
-        private List<Boolean> isCreated;
-        private List<View> views;
+        
 
         public StepListAdapter(List<Step> steps) {
             this.steps = steps;
-            views = new ArrayList<View>();
-            isCreated = new ArrayList<Boolean>();
+            
             for (int i = 0; i < steps.size(); i++) {
-                isCreated.add(Boolean.FALSE);
+                recipeManager.getIsCreated().add(Boolean.FALSE);
             }
         }
 
@@ -105,23 +109,23 @@ public class RecipeDescriptionActivity extends Activity {
         public View getView(int position, View convertView, ViewGroup parent) {
             Log.d(LOG_TAG, "Get view by position: " + position);
             // Don't need to create view more than one time
-            if (isCreated.get(position)) {
-                return views.get(position);
+            if (recipeManager.getIsCreated().get(position)) {
+                return recipeManager.getViews().get(position);
             }
             View item = convertView;
             StepHolder holder = null;
-            if (item == null) {
+            //if (item == null) {
                 item = getLayoutInflater().inflate(
                         R.layout.step_list_item, parent, false);
                 holder = new StepHolder(item);
-                item.setTag(holder);
-            } else {
-                holder = (StepHolder) item.getTag();
-            }
-
-            holder.populateFrom((Step) getItem(position));
-            views.add(item);
-            isCreated.set(position, Boolean.TRUE);
+            //    item.setTag(holder);
+            //} else {
+            //    holder = (StepHolder) item.getTag();
+            //}
+            Log.d(LOG_TAG, "getView() position: " + position);
+            holder.populateFrom((Step) getItem(position), position);
+            recipeManager.getViews().add(item);
+            recipeManager.getIsCreated().set(position, Boolean.TRUE);
 
             return item;
         }
@@ -142,18 +146,16 @@ public class RecipeDescriptionActivity extends Activity {
             btnTimerControl = (Button) item.findViewById(R.id.btnTimerControl);
         }
 
-        /*
-         * Set fields with text
+        /* Set fields with text
          * Set properties
-         *
          */
-        void populateFrom(Step step) {
+        void populateFrom(Step step, int position) {
             tvDescription.setText(step.getDescription());
             if (step.getTime() != 0) {
                 tvTimerLabel.setText(String.valueOf(step.getTime()));
                 btnTimerControl.setOnClickListener(
                         new TimerButtonListener(
-                                RecipeDescriptionActivity.this, tvTimerLabel, step.getTime()));
+                                RecipeDescriptionActivity.this, position, step.getTime()));
                 btnTimerControl.setText("Start");
             } else {
                 btnTimerControl.setVisibility(View.INVISIBLE);

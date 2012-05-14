@@ -1,13 +1,12 @@
 package gmc.hotplate.activities;
 
 import java.util.Timer;
-import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.TextView;
 
 public class TimerButtonListener implements OnClickListener {
@@ -16,26 +15,44 @@ public class TimerButtonListener implements OnClickListener {
     private Activity activity;
     private TextView view;
     private Timer timer;
+    private int position;
     private int timerDefault;
     private int timerCount;
     private Boolean isStarted = Boolean.FALSE;
     public static final int ONE_SECOND = 1000;
 
-    public TimerButtonListener(Activity activity, TextView view, int timerCount) {
+    public TimerButtonListener(Activity activity, int position, int timerCount) {
         super();
         this.activity = activity;
         this.view = view;
         this.timerCount = timerCount;
         this.timerDefault = timerCount;
+        this.position = position;
     }
 
     @Override
     public void onClick(final View v) {
         if (isStarted) {
+            activity.stopService(new Intent(activity, TimerService.class));
+            Log.d(LOG_TAG, "Service stopped");
+            isStarted = false;
+        } else {
+            Intent intent = new Intent(activity, TimerService.class);
+            Log.d(LOG_TAG, "extra pos: " + position);
+            intent.putExtra(TimerService.ITEM_POSITION, position);
+            activity.startService(intent);
+            isStarted = true;
+        }
+        /*
+        if (isStarted) {
             resetTimer();
             ((Button) v).setText("Start");
-            view.setText(String.valueOf(timerDefault));
+            View parent = (View) v.getParent();
+            TextView child = (TextView) parent.findViewById(R.id.tvTimerLabel);
+            child.setText(String.valueOf(timerDefault));
+            // view.setText(String.valueOf(timerDefault));
         } else {
+            
             ((Button) v).setText("Stop");
             if (getTimerCount() <= 0) {
                 return;
@@ -65,6 +82,8 @@ public class TimerButtonListener implements OnClickListener {
             }, 0, ONE_SECOND);
             isStarted = true;
         }
+        
+        */
     }
 
     void resetTimer() {

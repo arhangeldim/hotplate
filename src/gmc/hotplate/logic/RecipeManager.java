@@ -27,16 +27,21 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import android.app.Activity;
 import android.util.Log;
+import android.view.View;
 
 public final class RecipeManager {
-
-    private static final String LOG_TAG = "RecipeManager";
+    private static final String LOG_TAG = RecipeManager.class.getName();
     private static RecipeManager sInstance = null;
     private Recipe currentRecipe;
+    private Activity currentActivity;
+    private List<Boolean> isCreated;
+    private List<View> views;
 
     private RecipeManager() {
-
+        views = new ArrayList<View>();
+        isCreated = new ArrayList<Boolean>();
     }
 
     public static synchronized RecipeManager getInstance() {
@@ -46,12 +51,38 @@ public final class RecipeManager {
         return sInstance;
     }
 
+    
+    
+    public List<Boolean> getIsCreated() {
+        return isCreated;
+    }
+
+    public void setIsCreated(List<Boolean> isCreated) {
+        this.isCreated = isCreated;
+    }
+
+    public List<View> getViews() {
+        return views;
+    }
+
+    public void setViews(List<View> views) {
+        this.views = views;
+    }
+
     public Recipe getCurrentRecipe() {
         return currentRecipe;
     }
 
     public void setCurrentRecipe(Recipe currentRecipe) {
         this.currentRecipe = currentRecipe;
+    }
+
+    public Activity getCurrentActivity() {
+        return currentActivity;
+    }
+
+    public void setCurrentActivity(Activity currentActivity) {
+        this.currentActivity = currentActivity;
     }
 
     public List<Step> parseSteps(String xmlString) throws ParserConfigurationException,

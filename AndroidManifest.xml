@@ -27,6 +27,9 @@
         </activity>
         <activity android:name=".activities.RecipeDescriptionActivity" >
         </activity>
+
+        <service android:name=".activities.TimerService" >
+        </service>
     </application>
 
 </manifest>
