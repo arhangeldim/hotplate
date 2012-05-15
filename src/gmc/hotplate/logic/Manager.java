@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2012 Hotplate developers. All rights reserved.
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
@@ -30,43 +29,41 @@ import org.xml.sax.SAXException;
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
-public final class RecipeManager {
-    private static final String LOG_TAG = RecipeManager.class.getName();
-    private static RecipeManager sInstance = null;
+public final class Manager {
+
+    private static final String LOG_TAG = Manager.class.getName();
+    private static Manager sInstance = null;
     private Recipe currentRecipe;
-    private Activity currentActivity;
-    private List<Boolean> isCreated;
-    private List<View> views;
+    private Activity activity;
+    private List<TextView> cachedTextViews;
+    private List<View> cachedViews;
+    private List<Boolean> isCached = null;
+    private List<Boolean> isTimerStarted = null;
 
-    private RecipeManager() {
-        views = new ArrayList<View>();
-        isCreated = new ArrayList<Boolean>();
+    private Manager() {
+        cachedViews = new ArrayList<View>();
+        cachedTextViews = new ArrayList<TextView>();
     }
 
-    public static synchronized RecipeManager getInstance() {
+    public static synchronized Manager getInstance() {
         if (sInstance == null) {
-            sInstance = new RecipeManager();
+            sInstance = new Manager();
         }
         return sInstance;
     }
 
-    
-    
-    public List<Boolean> getIsCreated() {
-        return isCreated;
+    public TextView getCachedTextView(int position) {
+        return cachedTextViews.get(position);
     }
 
-    public void setIsCreated(List<Boolean> isCreated) {
-        this.isCreated = isCreated;
+    public Boolean isTimerStarted(int position) {
+        return isTimerStarted.get(position);
     }
 
-    public List<View> getViews() {
-        return views;
-    }
-
-    public void setViews(List<View> views) {
-        this.views = views;
+    public void setTimerStarted(int position, Boolean state) {
+        isTimerStarted.set(position, state);
     }
 
     public Recipe getCurrentRecipe() {
@@ -77,12 +74,44 @@ public final class RecipeManager {
         this.currentRecipe = currentRecipe;
     }
 
-    public Activity getCurrentActivity() {
-        return currentActivity;
+    public Activity getActivity() {
+        return activity;
     }
 
-    public void setCurrentActivity(Activity currentActivity) {
-        this.currentActivity = currentActivity;
+    public void setActivity(Activity activity) {
+        this.activity = activity;
+    }
+
+    public List<TextView> getCachedTextViews() {
+        return cachedTextViews;
+    }
+
+    public void setCachedTextViews(List<TextView> cachedTextViews) {
+        this.cachedTextViews = cachedTextViews;
+    }
+
+    public List<View> getCachedViews() {
+        return cachedViews;
+    }
+
+    public void setCachedViews(List<View> cachedViews) {
+        this.cachedViews = cachedViews;
+    }
+
+    public List<Boolean> getIsCached() {
+        return isCached;
+    }
+
+    public void setIsCached(List<Boolean> isCached) {
+        this.isCached = isCached;
+    }
+
+    public List<Boolean> getIsTimerStarted() {
+        return isTimerStarted;
+    }
+
+    public void setIsTimerStarted(List<Boolean> isTimerStarted) {
+        this.isTimerStarted = isTimerStarted;
     }
 
     public List<Step> parseSteps(String xmlString) throws ParserConfigurationException,

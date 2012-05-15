@@ -1,5 +1,4 @@
-/*
-* Copyright (c) 2012 Hotplate developers. All rights reserved.
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
@@ -11,8 +10,8 @@ package gmc.hotplate.activities;
 import gmc.hotplate.R;
 import gmc.hotplate.entities.Recipe;
 import gmc.hotplate.logic.DatabaseManager;
-import gmc.hotplate.logic.IDatabaseManager;
-import gmc.hotplate.logic.RecipeManager;
+import gmc.hotplate.logic.IDataManager;
+import gmc.hotplate.logic.Manager;
 
 import java.util.List;
 
@@ -30,10 +29,10 @@ import android.widget.TextView;
 
 public class RecipesListMenuActivity extends Activity implements OnItemClickListener {
 
+    private static final String LOG_TAG = RecipesListMenuActivity.class.getName();
     public static final int QUERY_LIMIT = 10;
-    private static final String LOG_TAG = "RecipesListMenuActivity";
-    private IDatabaseManager dbManager;
-    private RecipeManager recipeManager;
+    private IDataManager dbManager;
+    private Manager recipeManager;
     private ListView lvRecipes;
 
     @Override
@@ -42,7 +41,7 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
         setContentView(R.layout.recipe_list);
         Log.d(LOG_TAG, "Created RecipesListMenyActivity");
         dbManager = DatabaseManager.getInstance(this);
-        recipeManager = RecipeManager.getInstance();
+        recipeManager = Manager.getInstance();
         lvRecipes = (ListView) findViewById(R.id.lvRecipes);
 
         List<Recipe> recipes = dbManager.getRecipes(QUERY_LIMIT);

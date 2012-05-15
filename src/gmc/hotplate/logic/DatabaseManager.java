@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2012 Hotplate developers. All rights reserved.
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
@@ -25,21 +24,21 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public final class DatabaseManager implements IDatabaseManager {
+public final class DatabaseManager implements IDataManager {
 
-    private static final String LOG_TAG = "DatabaseManager";
+    private static final String LOG_TAG = DatabaseManager.class.getName();
 
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private static DatabaseManager sInstance = null;
-    private RecipeManager recipeManager;
+    private Manager recipeManager;
 
     private DatabaseManager(Context context) {
         int dbVersion = Integer.parseInt(context.getResources().getString(R.string.db_version));
         String dbName = context.getResources().getString(R.string.db_name);
         dbHelper = new DBHelper(context, dbName, null, dbVersion);
         db = dbHelper.getWritableDatabase();
-        recipeManager = RecipeManager.getInstance();
+        recipeManager = Manager.getInstance();
     }
 
     public static synchronized DatabaseManager getInstance(Context context) {
@@ -60,7 +59,6 @@ public final class DatabaseManager implements IDatabaseManager {
         String[] columns = {"_id", "name", "category_id", "description", "person_count", "steps"};
         Cursor cursor = db.query("recipes", columns, null, null, null, null, null,
                  String.valueOf(limit));
-        int cursorCount = cursor.getCount();
         List<Recipe> recipes = new ArrayList<Recipe>();
         Recipe recipe;
         if (cursor.moveToFirst()) {

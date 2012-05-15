@@ -10,32 +10,36 @@ package gmc.hotplate.activities;
 import gmc.hotplate.R;
 import gmc.hotplate.entities.Product;
 import gmc.hotplate.entities.Step;
-import gmc.hotplate.logic.RecipeManager;
+import gmc.hotplate.logic.Manager;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-/* Activity contains recipe name, list of ingredients, steps
- *
+/*
+ * Activity contains recipe name, list of ingredients, steps
  */
 public class RecipeDescriptionActivity extends Activity {
     private static final String LOG_TAG = RecipeDescriptionActivity.class.getName();
-    private RecipeManager recipeManager;
-    private TextView tvRecipeName;
-    private TextView tvIngredients;
+    private Manager manager;
     private ListView lvSteps;
     private StepListAdapter adapter;
+    private TextView tvRecipeName;
+    private TextView tvIngredients;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,50 +47,57 @@ public class RecipeDescriptionActivity extends Activity {
         setContentView(R.layout.recipe_description);
 
         Log.d(LOG_TAG, "Activity Created");
-        recipeManager = RecipeManager.getInstance();
+        manager = Manager.getInstance();
         tvRecipeName = (TextView) findViewById(R.id.tvRecipeName);
         tvIngredients = (TextView) findViewById(R.id.tvRecipeIngredients);
         lvSteps = (ListView) findViewById(R.id.lvSteps);
 
-        tvRecipeName.setText(recipeManager.getCurrentRecipe().getName());
+        tvRecipeName.setText(manager.getCurrentRecipe().getName());
+        List<Step> steps = manager.getCurrentRecipe().getSteps();
 
+        // Show ingredients (text)
         StringBuilder builder = new StringBuilder();
-        Map<Product, Float> ingredients = recipeManager.getCurrentRecipe().getIngredients();
+        Map<Product, Float> ingredients = manager.getCurrentRecipe().getIngredients();
         for (Map.Entry<Product, Float> entry : ingredients.entrySet()) {
             builder.append(entry.getKey().getName() + "     -   " + entry.getValue() + "\n");
         }
         tvIngredients.setText(builder.toString());
 
-        List<Step> steps = recipeManager.getCurrentRecipe().getSteps();
         adapter = new StepListAdapter(steps);
         lvSteps.setAdapter(adapter);
-        recipeManager.setCurrentActivity(this);
-    }
-    
-    public StepListAdapter getStepListAdapter() {
-        assert adapter != null : "Adapter is null";
-        return adapter;
+        manager.setActivity(this);
     }
 
     /*
-     * Adapter for steps list
-     *
+     * Custom adapter for steps list
      */
     public class StepListAdapter extends BaseAdapter {
 
-        private static final String LOG_TAG = "StepListAdapter";
+        private LayoutInflater inflater;
         private List<Step> steps;
-        
-
-        // When view is created, set isCreated=true
-        // and add view in List views.  List size = number of positions = number of steps
-        
 
         public StepListAdapter(List<Step> steps) {
             this.steps = steps;
-            
-            for (int i = 0; i < steps.size(); i++) {
-                recipeManager.getIsCreated().add(Boolean.FALSE);
+            inflater = (LayoutInflater) RecipeDescriptionActivity.this.getSystemService(
+                    Context.LAYOUT_INFLATER_SERVICE);
+
+            // Set cached flags to FALSE if there is no old cached info
+            if (manager.getIsCached() == null) {
+                Log.d(LOG_TAG, "Setting cached flags to FALSE");
+                List<Boolean> isCached = new ArrayList<Boolean>();
+                for (int i = 0; i < steps.size(); i++) {
+                    isCached.add(Boolean.FALSE);
+                }
+                manager.setIsCached(isCached);
+            }
+
+            // Set timers flags to FALSE if there is no running timers
+            if (manager.getIsTimerStarted() == null) {
+                List<Boolean> isTimerStarted = new ArrayList<Boolean>();
+                for (int i = 0; i < steps.size(); i++) {
+                    isTimerStarted.add(Boolean.FALSE);
+                }
+                manager.setIsTimerStarted(isTimerStarted);
             }
         }
 
@@ -107,58 +118,56 @@ public class RecipeDescriptionActivity extends Activity {
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            Log.d(LOG_TAG, "Get view by position: " + position);
-            // Don't need to create view more than one time
-            if (recipeManager.getIsCreated().get(position)) {
-                return recipeManager.getViews().get(position);
-            }
-            View item = convertView;
-            StepHolder holder = null;
-            //if (item == null) {
-                item = getLayoutInflater().inflate(
-                        R.layout.step_list_item, parent, false);
-                holder = new StepHolder(item);
-            //    item.setTag(holder);
-            //} else {
-            //    holder = (StepHolder) item.getTag();
-            //}
-            Log.d(LOG_TAG, "getView() position: " + position);
-            holder.populateFrom((Step) getItem(position), position);
-            recipeManager.getViews().add(item);
-            recipeManager.getIsCreated().set(position, Boolean.TRUE);
 
+            // Returns cached view if it exists
+            if (manager.getIsCached().get(position)) {
+                return manager.getCachedViews().get(position);
+            }
+            View item = inflater.inflate(R.layout.step_list_item, parent, false);
+            TextView tvDescription = (TextView) item.findViewById(R.id.tvStepDescr);
+            TextView tvTimerLabel = (TextView) item.findViewById(R.id.tvTimerLabel);
+            Button btnTimerControl = (Button) item.findViewById(R.id.btnTimerControl);
+
+            // Set info to fields from entity
+            Step step = (Step) getItem(position);
+            tvDescription.setText(step.getDescription());
+            tvTimerLabel.setText(String.valueOf(step.getTime()));
+            btnTimerControl.setText("Press");
+            btnTimerControl.setOnClickListener(new TimerButtonListener(position));
+
+            // Cache info about view
+            manager.getIsCached().set(position, Boolean.TRUE);
+            manager.getCachedTextViews().add(position, tvTimerLabel);
+            manager.getCachedViews().add(position, item);
             return item;
         }
     }
 
-    /*
-     * Set elements of list items
-     *
-     */
-    class StepHolder {
-        private TextView tvDescription;
-        private TextView tvTimerLabel;
-        private Button btnTimerControl;
+    class TimerButtonListener implements OnClickListener {
 
-        StepHolder(View item) {
-            tvDescription = (TextView) item.findViewById(R.id.tvStepDescr);
-            tvTimerLabel = (TextView) item.findViewById(R.id.tvTimerLabel);
-            btnTimerControl = (Button) item.findViewById(R.id.btnTimerControl);
+        private int position;
+
+        public TimerButtonListener(int position) {
+            this.position = position;
         }
 
-        /* Set fields with text
-         * Set properties
-         */
-        void populateFrom(Step step, int position) {
-            tvDescription.setText(step.getDescription());
-            if (step.getTime() != 0) {
-                tvTimerLabel.setText(String.valueOf(step.getTime()));
-                btnTimerControl.setOnClickListener(
-                        new TimerButtonListener(
-                                RecipeDescriptionActivity.this, position, step.getTime()));
-                btnTimerControl.setText("Start");
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(RecipeDescriptionActivity.this, TimerService.class);
+
+            // Send info to service
+            if (manager.isTimerStarted(position)) {
+                Log.d(LOG_TAG, "Button #" + position + " pressed: stopping");
+                intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_STOP);
+                intent.putExtra(TimerService.ITEM_POSITION, position);
+                RecipeDescriptionActivity.this.startService(intent);
+                manager.setTimerStarted(position, Boolean.FALSE);
             } else {
-                btnTimerControl.setVisibility(View.INVISIBLE);
+                Log.d(LOG_TAG, "Button #" + position + " pressed: starting");
+                intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_START);
+                intent.putExtra(TimerService.ITEM_POSITION, position);
+                RecipeDescriptionActivity.this.startService(intent);
+                manager.setTimerStarted(position, Boolean.TRUE);
             }
         }
     }
