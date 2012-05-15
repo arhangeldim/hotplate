@@ -131,9 +131,14 @@ public class RecipeDescriptionActivity extends Activity {
             // Set info to fields from entity
             Step step = (Step) getItem(position);
             tvDescription.setText(step.getDescription());
-            tvTimerLabel.setText(String.valueOf(step.getTime()));
-            btnTimerControl.setText("Press");
-            btnTimerControl.setOnClickListener(new TimerButtonListener(position));
+            if (step.getTime() != 0) {
+                tvTimerLabel.setText(String.valueOf(step.getTime()));
+                btnTimerControl.setText("Start");
+                btnTimerControl.setOnClickListener(new TimerButtonListener(position));
+            } else {
+                tvTimerLabel.setVisibility(View.INVISIBLE);
+                btnTimerControl.setVisibility(View.INVISIBLE);
+            }
 
             // Cache info about view
             manager.getIsCached().set(position, Boolean.TRUE);
@@ -161,12 +166,16 @@ public class RecipeDescriptionActivity extends Activity {
                 intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_STOP);
                 intent.putExtra(TimerService.ITEM_POSITION, position);
                 RecipeDescriptionActivity.this.startService(intent);
+                manager.getButton(position).setText("Start");
                 manager.setTimerStarted(position, Boolean.FALSE);
             } else {
                 Log.d(LOG_TAG, "Button #" + position + " pressed: starting");
                 intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_START);
                 intent.putExtra(TimerService.ITEM_POSITION, position);
+                intent.putExtra(TimerService.ITEM_TIMER,
+                        ((Step) adapter.getItem(position)).getTime());
                 RecipeDescriptionActivity.this.startService(intent);
+                manager.getButton(position).setText("Stop");
                 manager.setTimerStarted(position, Boolean.TRUE);
             }
         }

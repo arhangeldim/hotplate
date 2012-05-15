@@ -7,6 +7,7 @@
 
 package gmc.hotplate.logic;
 
+import gmc.hotplate.R;
 import gmc.hotplate.entities.Recipe;
 import gmc.hotplate.entities.Step;
 
@@ -29,6 +30,7 @@ import org.xml.sax.SAXException;
 import android.app.Activity;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public final class Manager {
@@ -96,6 +98,10 @@ public final class Manager {
 
     public void setCachedViews(List<View> cachedViews) {
         this.cachedViews = cachedViews;
+    }
+
+    public Button getButton(int position) {
+        return (Button) cachedViews.get(position).findViewById(R.id.btnTimerControl);
     }
 
     public List<Boolean> getIsCached() {
