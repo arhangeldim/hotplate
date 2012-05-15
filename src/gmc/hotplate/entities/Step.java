@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2012 Hotplate developers. All rights reserved.
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
@@ -11,6 +10,7 @@ package gmc.hotplate.entities;
 import java.util.List;
 
 public class Step {
+
 
     private int id;
     private String name;
@@ -54,8 +54,8 @@ public class Step {
     public int getTime() {
         return time;
     }
-    public void setTime(int seconds) {
-        this.time = seconds;
+    public void setTime(int time) {
+        this.time = time;
     }
     public List<Product> getIngridients() {
         return ingredients;
@@ -70,5 +70,10 @@ public class Step {
         this.blockList = blockList;
     }
 
+    public String toString() {
+        return "name: " + name + "\n"
+                + "description: " + description + "\n"
+                + "time: " + time + "\n";
+    }
 
 }

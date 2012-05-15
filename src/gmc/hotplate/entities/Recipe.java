@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2012 Hotplate developers. All rights reserved.
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
@@ -9,6 +8,7 @@
 package gmc.hotplate.entities;
 
 import java.util.List;
+import java.util.Map;
 
 public class Recipe {
 
@@ -18,6 +18,8 @@ public class Recipe {
     private String description;
     private int personCount;
     private List<Step> steps;
+    private Map<Product, Float> ingredients;
+
 
     public Recipe() {
 
@@ -79,6 +81,14 @@ public class Recipe {
 
     public void setSteps(List<Step> steps) {
         this.steps = steps;
+    }
+
+    public Map<Product, Float> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(Map<Product, Float> ingredients) {
+        this.ingredients = ingredients;
     }
 
     @Override

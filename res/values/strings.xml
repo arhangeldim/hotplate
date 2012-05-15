@@ -6,4 +6,5 @@
     <string name="menu_recipe_label">Список Рецептов</string>
     <string name="db_version">1</string>
     <string name="recipe_list_menu_label">Кулинарная книга</string>
+    <string name="btn_start_label">Старт</string>
 </resources>

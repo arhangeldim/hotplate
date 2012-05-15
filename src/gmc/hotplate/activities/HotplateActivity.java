@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2012 Hotplate developers. All rights reserved.
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
@@ -19,7 +18,7 @@ import android.widget.Button;
 
 public class HotplateActivity extends Activity implements OnClickListener {
 
-    private static final String LOG_TAG = "HotplateActivity";
+    private static final String LOG_TAG = HotplateActivity.class.getName();
     private Button btnRecipeList;
 
     @Override

@@ -1,5 +1,4 @@
-/*
- * Copyright (c) 2012 Hotplate developers. All rights reserved.
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
  * Use of this source code is governed by a BSD-style license that can be
  * found in the LICENSE file.
  *
@@ -12,7 +11,10 @@ import gmc.hotplate.R;
 import gmc.hotplate.entities.Product;
 import gmc.hotplate.entities.Recipe;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -22,19 +24,21 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-public final class DatabaseManager implements IDatabaseManager {
+public final class DatabaseManager implements IDataManager {
 
-    private static final String LOG_TAG = "DatabaseManager";
+    private static final String LOG_TAG = DatabaseManager.class.getName();
 
     private DBHelper dbHelper;
     private SQLiteDatabase db;
     private static DatabaseManager sInstance = null;
+    private Manager recipeManager;
 
     private DatabaseManager(Context context) {
         int dbVersion = Integer.parseInt(context.getResources().getString(R.string.db_version));
         String dbName = context.getResources().getString(R.string.db_name);
         dbHelper = new DBHelper(context, dbName, null, dbVersion);
         db = dbHelper.getWritableDatabase();
+        recipeManager = Manager.getInstance();
     }
 
     public static synchronized DatabaseManager getInstance(Context context) {
@@ -44,7 +48,6 @@ public final class DatabaseManager implements IDatabaseManager {
         return sInstance;
     }
 
-    @Override
     public void close() {
         if (dbHelper != null) {
             dbHelper.close();
@@ -52,36 +55,73 @@ public final class DatabaseManager implements IDatabaseManager {
     }
 
     @Override
-    public Recipe[] getRecipes(int limit) {
+    public List<Recipe> getRecipes(int limit) {
         String[] columns = {"_id", "name", "category_id", "description", "person_count", "steps"};
         Cursor cursor = db.query("recipes", columns, null, null, null, null, null,
                  String.valueOf(limit));
-        int cursorCount = cursor.getCount();
-        Log.d(LOG_TAG, "Cursor size: " + cursorCount);
-        Recipe[] recipes = new Recipe[cursorCount];
+        List<Recipe> recipes = new ArrayList<Recipe>();
         Recipe recipe;
         if (cursor.moveToFirst()) {
             do {
                 recipe = new Recipe();
-                recipe.setId(cursor.getInt(cursor.getColumnIndex("_id")));
+                int recipeId = cursor.getInt(cursor.getColumnIndex("_id"));
+                recipe.setId(recipeId);
                 recipe.setName(cursor.getString(cursor.getColumnIndex("name")));
                 recipe.setCategoryId(cursor.getInt(cursor.getColumnIndex("category_id")));
                 recipe.setDescription(cursor.getString(cursor.getColumnIndex("description")));
                 recipe.setPersonCount(cursor.getInt(cursor.getColumnIndex("person_count")));
-                //TODO(arhangeldim): To get info about steps.
-
-                recipes[cursor.getPosition()] = recipe;
+                recipe.setIngredients(getIngredients(recipeId));
+                //TODO(arhangeldim): Fix exception handling.
+                try {
+                    recipe.setSteps(recipeManager.parseSteps(cursor.getString(
+                            cursor.getColumnIndex("steps"))));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                recipes.add(recipe);
             } while (cursor.moveToNext());
         }
         return recipes;
     }
 
 
-
     @Override
-    public List<Product> getProductsList(int type, int limit) {
-        // TODO Auto-generated method stub
-        return null;
+    public Map<Product, Float> getIngredients(int recipeId) {
+        String table = "products as PR inner join ingredients as IG on IG.product_id = PR._id";
+        String[] columns = {"IG.recipe_id as Rid", "PR._id as Pid", "PR.name as Name",
+                "PR.type as Type", "IG.amount as Amount"};
+        String selection = "Rid = ?";
+        String[] args = {String.valueOf(recipeId)};
+        Cursor cursor = db.query(table, columns, selection, args, null, null, null);
+        Map<Product, Float> products = new HashMap<Product, Float>();
+        if (cursor.moveToFirst()) {
+            do {
+                Product product = new Product();
+                Float amount = cursor.getFloat(cursor.getColumnIndex("Amount"));
+                product.setId(cursor.getInt(cursor.getColumnIndex("Rid")));
+                product.setName(cursor.getString(cursor.getColumnIndex("Name")));
+                products.put(product, amount);
+            } while (cursor.moveToNext());
+        }
+        return products;
+    }
+
+    public void logCursor(Cursor cursor) {
+        if (cursor != null) {
+            if (cursor.moveToFirst()) {
+                String data;
+                do {
+                    data = "";
+                    for (String columnName : cursor.getColumnNames()) {
+                        data = data.concat(columnName + " = " + cursor.getString(
+                                cursor.getColumnIndex(columnName)) + ";");
+                    }
+                    Log.d(LOG_TAG, data);
+                } while (cursor.moveToNext());
+            }
+        } else {
+            Log.d(LOG_TAG, "Cursor is null");
+        }
     }
 
     @Override
@@ -182,7 +222,7 @@ public final class DatabaseManager implements IDatabaseManager {
                              "      <description>" +
                              "Для выносливых: ждём 1 минуту, наслаждаясь" +
                              " сладостным ароматом бутерброда, а потом съедаем его! </description>" +
-                             "      <time> 60 </time>" +
+                             "      <time>10</time>" +
                              "  </step>" +
                              "</steps>";
 
@@ -198,7 +238,7 @@ public final class DatabaseManager implements IDatabaseManager {
                              "      <id> 2 </id>" +
                              "      <name> Топор </name>" +
                              "      <description> Кидаем в кипящую воду топор и варим его 60 сек. </description>" +
-                             "      <time> 60 </time>" +
+                             "      <time> 20 </time>" +
                              "  </step>" +
                              "  <step>" +
                              "      <id> 3 </id>" +
@@ -227,7 +267,7 @@ public final class DatabaseManager implements IDatabaseManager {
                              "      <name> Кидаем морковку в суп </name>" +
                              "      <description> Кидаем в кипящую воду с топором и картошкой морковь " +
                              "и варим их 60 сек. </description>" +
-                             "      <time> 60 </time>" +
+                             "      <time> 10 </time>" +
                              "      <blocklist>" +
                              "          <item> 4 </item>" +
                              "          <item> 5 </item>" +
@@ -325,6 +365,12 @@ public final class DatabaseManager implements IDatabaseManager {
 
     @Override
     public Recipe[] getRecipes(int categoryId, int limit) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<Product> getProductsList(int type, int limit) {
         // TODO Auto-generated method stub
         return null;
     }
