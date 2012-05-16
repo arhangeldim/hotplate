@@ -64,6 +64,17 @@ public final class Manager {
         return isTimerStarted.get(position);
     }
 
+    public Boolean isAnyTimerStarted() {
+        Boolean result = Boolean.FALSE;
+        if (isTimerStarted == null) {
+            return Boolean.FALSE;
+        }
+        for (Boolean b : isTimerStarted) {
+            result |= b;
+        }
+        return result;
+    }
+
     public void setTimerStarted(int position, Boolean state) {
         isTimerStarted.set(position, state);
     }
