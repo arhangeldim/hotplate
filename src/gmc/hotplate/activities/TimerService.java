@@ -59,9 +59,9 @@ public class TimerService extends Service {
         Bundle bundle = intent.getExtras();
         int position = bundle.getInt(ITEM_POSITION);
         int action = bundle.getInt(ITEM_ACTION);
+        int seconds = bundle.getInt(ITEM_TIMER);
         Log.d(LOG_TAG, "Extras: action=" + action + ", pos=" + position);
         if (action == TIMER_START) {
-            int seconds = bundle.getInt(ITEM_TIMER);
             final Runnable task = new UpdateViewTask(position, seconds);
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -73,7 +73,7 @@ public class TimerService extends Service {
             }, 0, INTERVAL);
             timers.put(position, timer);
         } else if (action == TIMER_STOP) {
-            timers.get(position).cancel();
+            cancelTimer(position, seconds);
         } else {
             cancelAllTimer();
         }
@@ -83,11 +83,13 @@ public class TimerService extends Service {
     class UpdateViewTask implements Runnable {
 
         private int position;
+        private int defaultSeconds;
         private int seconds;
 
         public UpdateViewTask(int position, int seconds) {
             this.position = position;
             this.seconds = seconds;
+            defaultSeconds = seconds;
         }
 
         @Override
@@ -95,7 +97,7 @@ public class TimerService extends Service {
             manager.getCachedTextView(position).setText(String.valueOf(seconds));
             seconds--;
             if (seconds < 0) {
-                cancelTimer(position);
+                cancelTimer(position, defaultSeconds);
                 Toast.makeText(manager.getActivity(),
                         "Timer #" + position + " ended", Toast.LENGTH_SHORT).show();
                 Log.d(LOG_TAG, "Toast notification: Timer #" + position + " ended");
@@ -103,11 +105,12 @@ public class TimerService extends Service {
         }
     }
 
-    public void cancelTimer(int position) {
+    public void cancelTimer(int position, int defaultSeconds) {
         timers.get(position).cancel();
         manager.getIsTimerStarted().set(position, Boolean.FALSE);
         Log.d(LOG_TAG, "Timer #" + position + " stopped");
         manager.getButton(position).setText("Start");
+        manager.getCachedTextView(position).setText(String.valueOf(defaultSeconds));
     }
 
     public void cancelAllTimer() {

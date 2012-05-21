@@ -68,6 +68,13 @@ public class RecipeDescriptionActivity extends Activity {
         manager.setActivity(this);
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+
+
     /*
      * Custom adapter for steps list
      */
@@ -82,17 +89,15 @@ public class RecipeDescriptionActivity extends Activity {
                     Context.LAYOUT_INFLATER_SERVICE);
 
             // Set cached flags to FALSE if there is no old cached info
-            if (manager.getIsCached() == null) {
-                Log.d(LOG_TAG, "Setting cached flags to FALSE");
-                List<Boolean> isCached = new ArrayList<Boolean>();
-                for (int i = 0; i < steps.size(); i++) {
-                    isCached.add(Boolean.FALSE);
-                }
-                manager.setIsCached(isCached);
+            Log.d(LOG_TAG, "Setting cached flags to FALSE");
+            List<Boolean> isCached = new ArrayList<Boolean>();
+            for (int i = 0; i < steps.size(); i++) {
+                isCached.add(Boolean.FALSE);
             }
+            manager.setIsCached(isCached);
 
             // Set timers flags to FALSE if there is no running timers
-            if (manager.getIsTimerStarted() == null) {
+            if (!manager.isAnyTimerStarted()) {
                 List<Boolean> isTimerStarted = new ArrayList<Boolean>();
                 for (int i = 0; i < steps.size(); i++) {
                     isTimerStarted.add(Boolean.FALSE);
@@ -133,7 +138,11 @@ public class RecipeDescriptionActivity extends Activity {
             tvDescription.setText(step.getDescription());
             if (step.getTime() != 0) {
                 tvTimerLabel.setText(String.valueOf(step.getTime()));
-                btnTimerControl.setText("Start");
+                if (manager.getIsTimerStarted().get(position)) {
+                    btnTimerControl.setText("Stop");
+                } else {
+                    btnTimerControl.setText("Start");
+                }
                 btnTimerControl.setOnClickListener(new TimerButtonListener(position));
             } else {
                 tvTimerLabel.setVisibility(View.INVISIBLE);
@@ -159,21 +168,19 @@ public class RecipeDescriptionActivity extends Activity {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(RecipeDescriptionActivity.this, TimerService.class);
+            intent.putExtra(TimerService.ITEM_POSITION, position);
+            intent.putExtra(TimerService.ITEM_TIMER,
+                    ((Step) adapter.getItem(position)).getTime());
 
-            // Send info to service
             if (manager.isTimerStarted(position)) {
                 Log.d(LOG_TAG, "Button #" + position + " pressed: stopping");
                 intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_STOP);
-                intent.putExtra(TimerService.ITEM_POSITION, position);
                 RecipeDescriptionActivity.this.startService(intent);
                 manager.getButton(position).setText("Start");
                 manager.setTimerStarted(position, Boolean.FALSE);
             } else {
                 Log.d(LOG_TAG, "Button #" + position + " pressed: starting");
                 intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_START);
-                intent.putExtra(TimerService.ITEM_POSITION, position);
-                intent.putExtra(TimerService.ITEM_TIMER,
-                        ((Step) adapter.getItem(position)).getTime());
                 RecipeDescriptionActivity.this.startService(intent);
                 manager.getButton(position).setText("Stop");
                 manager.setTimerStarted(position, Boolean.TRUE);
