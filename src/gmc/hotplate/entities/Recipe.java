@@ -13,12 +13,12 @@ import java.util.Map;
 public class Recipe {
 
     private int id;
-    private int categoryId;
     private String name;
     private String description;
     private int personCount;
     private List<Step> steps;
-    private Map<Product, Float> ingredients;
+    private Map<Ingredient, Float> ingredients;
+    private List<Category> categories;
 
 
     public Recipe() {
@@ -28,7 +28,6 @@ public class Recipe {
     public Recipe(int id, int categoryId, String name, String description, int personCount,
             List<Step> steps) {
         this.id = id;
-        this.categoryId = categoryId;
         this.name = name;
         this.description = description;
         this.personCount = personCount;
@@ -41,14 +40,6 @@ public class Recipe {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(int categoryId) {
-        this.categoryId = categoryId;
     }
 
     public String getName() {
@@ -83,11 +74,11 @@ public class Recipe {
         this.steps = steps;
     }
 
-    public Map<Product, Float> getIngredients() {
+    public Map<Ingredient, Float> getIngredients() {
         return ingredients;
     }
 
-    public void setIngredients(Map<Product, Float> ingredients) {
+    public void setIngredients(Map<Ingredient, Float> ingredients) {
         this.ingredients = ingredients;
     }
 
