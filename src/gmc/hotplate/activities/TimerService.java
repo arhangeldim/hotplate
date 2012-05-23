@@ -29,10 +29,13 @@ public class TimerService extends Service {
     public static final String ITEM_TIMER = "item_timer";
     public static final int TIMER_START = 0;
     public static final int TIMER_STOP = 1;
+    public static final int ALL_TIMERS_STOP = 2;
     public static final int INTERVAL = 1000;
 
     private Manager manager;
     private Map<Integer, Timer> timers;
+    // Default value for timer on positoin <position, seconds>
+    private Map<Integer, Integer> defaultTimerSeconds;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -44,6 +47,7 @@ public class TimerService extends Service {
         super.onCreate();
         Log.d(LOG_TAG, "Service created");
         timers = new HashMap<Integer, Timer>();
+        defaultTimerSeconds = new HashMap<Integer, Integer>();
         manager = Manager.getInstance();
     }
 
@@ -60,8 +64,9 @@ public class TimerService extends Service {
         int position = bundle.getInt(ITEM_POSITION);
         int action = bundle.getInt(ITEM_ACTION);
         int seconds = bundle.getInt(ITEM_TIMER);
-        Log.d(LOG_TAG, "Extras: action=" + action + ", pos=" + position);
+        Log.d(LOG_TAG, "Extras: action=" + action + ", pos=" + position + "sec=" + seconds);
         if (action == TIMER_START) {
+            defaultTimerSeconds.put(position, seconds);
             final Runnable task = new UpdateViewTask(position, seconds);
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
@@ -74,6 +79,8 @@ public class TimerService extends Service {
             timers.put(position, timer);
         } else if (action == TIMER_STOP) {
             cancelTimer(position, seconds);
+        } else if (action == ALL_TIMERS_STOP) {
+            cancelAllTimer();
         } else {
             cancelAllTimer();
         }
@@ -106,18 +113,35 @@ public class TimerService extends Service {
     }
 
     public void cancelTimer(int position, int defaultSeconds) {
+        Log.d(LOG_TAG, "cancel timer: pos = " + position + " timers.size() = " + timers.size());
         timers.get(position).cancel();
         manager.getIsTimerStarted().set(position, Boolean.FALSE);
         Log.d(LOG_TAG, "Timer #" + position + " stopped");
         manager.getButton(position).setText("Start");
         manager.getCachedTextView(position).setText(String.valueOf(defaultSeconds));
+        // If there are no started timers
+        if (!manager.isAnyTimerStarted()) {
+            Log.d(LOG_TAG, "Set all field to default");
+            if (manager.getCurrentRecipe().getId() == manager.getStartedRecipeId()) {
+                Log.d(LOG_TAG, "Set Button enabled to false");
+                ((RecipeDescriptionActivity) manager.getActivity()).getBtnCancelAllTimers()
+                        .setEnabled(Boolean.FALSE);
+            }
+            manager.setStartedRecipeId(Manager.NONE);
+
+            // If recipe is ended clear timers hash
+            timers.clear();
+            defaultTimerSeconds.clear();
+        }
     }
 
     public void cancelAllTimer() {
         for (Map.Entry<Integer, Timer> t : timers.entrySet()) {
             if (t.getValue() != null) {
-                t.getValue().cancel();
+                int seconds = defaultTimerSeconds.get(t.getKey());
+                cancelTimer(t.getKey(), seconds);
             }
         }
+
     }
 }

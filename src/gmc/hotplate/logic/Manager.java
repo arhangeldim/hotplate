@@ -35,9 +35,11 @@ import android.widget.TextView;
 
 public final class Manager {
 
-    private static final String LOG_TAG = Manager.class.getName();
+    public static final String LOG_TAG = Manager.class.getName();
+    public static final int NONE = -1;
     private static Manager sInstance = null;
     private Recipe currentRecipe;
+    private int startedRecipeId;
     private Activity activity;
     private List<TextView> cachedTextViews;
     private List<View> cachedViews;
@@ -47,6 +49,7 @@ public final class Manager {
     private Manager() {
         cachedViews = new ArrayList<View>();
         cachedTextViews = new ArrayList<TextView>();
+        startedRecipeId = NONE;
     }
 
     public static synchronized Manager getInstance() {
@@ -85,6 +88,14 @@ public final class Manager {
 
     public void setCurrentRecipe(Recipe currentRecipe) {
         this.currentRecipe = currentRecipe;
+    }
+
+    public int getStartedRecipeId() {
+        return startedRecipeId;
+    }
+
+    public void setStartedRecipeId(int startedRecipeId) {
+        this.startedRecipeId = startedRecipeId;
     }
 
     public Activity getActivity() {
@@ -147,8 +158,6 @@ public final class Manager {
                     continue;
                 } else if (current.getNodeName().equals("id")) {
                     step.setId(Integer.parseInt(current.getTextContent().trim()));
-                } else if (current.getNodeName().equals("name")) {
-                    step.setName(current.getTextContent());
                 } else if (current.getNodeName().equals("description")) {
                     step.setDescription(current.getTextContent());
                 } else if (current.getNodeName().equals("time")) {

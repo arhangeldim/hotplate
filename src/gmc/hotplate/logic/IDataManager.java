@@ -7,7 +7,7 @@
 
 package gmc.hotplate.logic;
 
-import gmc.hotplate.entities.Product;
+import gmc.hotplate.entities.Ingredient;
 import gmc.hotplate.entities.Recipe;
 
 import java.util.List;
@@ -15,21 +15,21 @@ import java.util.Map;
 
 public interface IDataManager {
 
-    Recipe[] getRecipes(Product ingridient, int categoryId, int limit);
+    Recipe[] getRecipes(Ingredient ingridient, int categoryId, int limit);
 
-    Recipe[] getRecipes(Product ingridient, int limit);
+    Recipe[] getRecipes(Ingredient ingridient, int limit);
 
     Recipe[] getRecipes(int categoryId, int limit);
 
     List<Recipe> getRecipes(int limit);
 
-    List<Product> getProductsList(int type, int limit);
+    List<Ingredient> getProductsList(int type, int limit);
 
-    Map<Product, Float> getIngredients(int recipeId);
+    Map<Ingredient, Float> getIngredients(int recipeId);
 
     Recipe getRecipeById(int id);
 
-    Product getProductById(int id);
+    Ingredient getProductById(int id);
 
     void close();
 

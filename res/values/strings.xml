@@ -7,4 +7,6 @@
     <string name="db_version">1</string>
     <string name="recipe_list_menu_label">Кулинарная книга</string>
     <string name="btn_start_label">Старт</string>
+    <string name="btn_cancel_all_timers">Отменить все таймеры</string>
+    <color name="background">#fff9ea99</color>
 </resources>

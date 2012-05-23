@@ -8,7 +8,7 @@
 package gmc.hotplate.logic;
 
 import gmc.hotplate.R;
-import gmc.hotplate.entities.Product;
+import gmc.hotplate.entities.Ingredient;
 import gmc.hotplate.entities.Recipe;
 
 import java.util.ArrayList;
@@ -67,7 +67,6 @@ public final class DatabaseManager implements IDataManager {
                 int recipeId = cursor.getInt(cursor.getColumnIndex("_id"));
                 recipe.setId(recipeId);
                 recipe.setName(cursor.getString(cursor.getColumnIndex("name")));
-                recipe.setCategoryId(cursor.getInt(cursor.getColumnIndex("category_id")));
                 recipe.setDescription(cursor.getString(cursor.getColumnIndex("description")));
                 recipe.setPersonCount(cursor.getInt(cursor.getColumnIndex("person_count")));
                 recipe.setIngredients(getIngredients(recipeId));
@@ -86,17 +85,17 @@ public final class DatabaseManager implements IDataManager {
 
 
     @Override
-    public Map<Product, Float> getIngredients(int recipeId) {
+    public Map<Ingredient, Float> getIngredients(int recipeId) {
         String table = "products as PR inner join ingredients as IG on IG.product_id = PR._id";
         String[] columns = {"IG.recipe_id as Rid", "PR._id as Pid", "PR.name as Name",
                 "PR.type as Type", "IG.amount as Amount"};
         String selection = "Rid = ?";
         String[] args = {String.valueOf(recipeId)};
         Cursor cursor = db.query(table, columns, selection, args, null, null, null);
-        Map<Product, Float> products = new HashMap<Product, Float>();
+        Map<Ingredient, Float> products = new HashMap<Ingredient, Float>();
         if (cursor.moveToFirst()) {
             do {
-                Product product = new Product();
+                Ingredient product = new Ingredient();
                 Float amount = cursor.getFloat(cursor.getColumnIndex("Amount"));
                 product.setId(cursor.getInt(cursor.getColumnIndex("Rid")));
                 product.setName(cursor.getString(cursor.getColumnIndex("Name")));
@@ -131,7 +130,7 @@ public final class DatabaseManager implements IDataManager {
     }
 
     @Override
-    public Product getProductById(int id) {
+    public Ingredient getProductById(int id) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -352,13 +351,13 @@ public final class DatabaseManager implements IDataManager {
 
 
     @Override
-    public Recipe[] getRecipes(Product ingridient, int categoryId, int limit) {
+    public Recipe[] getRecipes(Ingredient ingridient, int categoryId, int limit) {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Recipe[] getRecipes(Product ingridient, int limit) {
+    public Recipe[] getRecipes(Ingredient ingridient, int limit) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -370,7 +369,7 @@ public final class DatabaseManager implements IDataManager {
     }
 
     @Override
-    public List<Product> getProductsList(int type, int limit) {
+    public List<Ingredient> getProductsList(int type, int limit) {
         // TODO Auto-generated method stub
         return null;
     }

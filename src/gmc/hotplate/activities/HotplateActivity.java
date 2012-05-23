@@ -10,6 +10,7 @@ package gmc.hotplate.activities;
 import gmc.hotplate.R;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -27,6 +28,8 @@ public class HotplateActivity extends Activity implements OnClickListener {
         setContentView(R.layout.main);
         btnRecipeList = (Button) findViewById(R.id.btnRecipeList);
         btnRecipeList.setOnClickListener(this);
+        Typeface font = Typeface.createFromAsset(getAssets(), "Roboto-Condensed.ttf");
+        btnRecipeList.setTypeface(font);
         Log.d(LOG_TAG, "Created HotplateActivity");
     }
 
