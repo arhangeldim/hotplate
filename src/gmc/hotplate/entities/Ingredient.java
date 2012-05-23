@@ -7,18 +7,18 @@
 
 package gmc.hotplate.entities;
 
-public class Product {
+public class Ingredient {
 
     private int id;
     private String name;
     private int type;
     private String imagePath;
 
-    public Product() {
+    public Ingredient() {
 
     }
 
-    public Product(int id, String name, int type, String imagePath) {
+    public Ingredient(int id, String name, int type, String imagePath) {
         this.id = id;
         this.name = name;
         this.type = type;

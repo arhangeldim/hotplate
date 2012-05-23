@@ -8,7 +8,7 @@
 package gmc.hotplate.activities;
 
 import gmc.hotplate.R;
-import gmc.hotplate.entities.Product;
+import gmc.hotplate.entities.Ingredient;
 import gmc.hotplate.entities.Step;
 import gmc.hotplate.logic.Manager;
 
@@ -35,11 +35,13 @@ import android.widget.TextView;
  */
 public class RecipeDescriptionActivity extends Activity {
     private static final String LOG_TAG = RecipeDescriptionActivity.class.getName();
+    private static final int DIALOG_STOP_TIMER = 1;
     private Manager manager;
     private ListView lvSteps;
     private StepListAdapter adapter;
     private TextView tvRecipeName;
     private TextView tvIngredients;
+    private Button btnCancelAllTimers;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,14 +53,23 @@ public class RecipeDescriptionActivity extends Activity {
         tvRecipeName = (TextView) findViewById(R.id.tvRecipeName);
         tvIngredients = (TextView) findViewById(R.id.tvRecipeIngredients);
         lvSteps = (ListView) findViewById(R.id.lvSteps);
+        btnCancelAllTimers = (Button) findViewById(R.id.btnCancelAllTimers);
+        btnCancelAllTimers.setOnClickListener(new TimerButtonListener());
 
+        // Default: button is disabled
+        btnCancelAllTimers.setEnabled(Boolean.FALSE);
+        if (manager.isAnyTimerStarted()
+                && manager.getStartedRecipeId() == manager.getCurrentRecipe().getId()) {
+            Log.d(LOG_TAG, "Set button enabled");
+            btnCancelAllTimers.setEnabled(Boolean.TRUE);
+        }
         tvRecipeName.setText(manager.getCurrentRecipe().getName());
         List<Step> steps = manager.getCurrentRecipe().getSteps();
 
         // Show ingredients (text)
         StringBuilder builder = new StringBuilder();
-        Map<Product, Float> ingredients = manager.getCurrentRecipe().getIngredients();
-        for (Map.Entry<Product, Float> entry : ingredients.entrySet()) {
+        Map<Ingredient, Float> ingredients = manager.getCurrentRecipe().getIngredients();
+        for (Map.Entry<Ingredient, Float> entry : ingredients.entrySet()) {
             builder.append(entry.getKey().getName() + "     -   " + entry.getValue() + "\n");
         }
         tvIngredients.setText(builder.toString());
@@ -68,12 +79,29 @@ public class RecipeDescriptionActivity extends Activity {
         manager.setActivity(this);
     }
 
+    public Button getBtnCancelAllTimers() {
+        return btnCancelAllTimers;
+    }
+
+    public void setBtnCancelAllTimers(Button btnCancelAllTimers) {
+        this.btnCancelAllTimers = btnCancelAllTimers;
+    }
+    /*
     @Override
     protected void onDestroy() {
+        // If this recipe is started
+        if (manager.isAnyTimerStarted()
+                && manager.getCurrentRecipe().getId() == manager.getStartedRecipeId()) {
+            showDialog(DIALOG_STOP_TIMER);
+        }
         super.onDestroy();
     }
 
-
+    protected Dialog onCreateDialog(int id) {
+        if (id == DIALOG_STOP_TIMER) {
+            AlertDialo
+        }
+    }
 
     /*
      * Custom adapter for steps list
@@ -126,6 +154,7 @@ public class RecipeDescriptionActivity extends Activity {
 
             // Returns cached view if it exists
             if (manager.getIsCached().get(position)) {
+                Log.d(LOG_TAG, "Get cached view " + position);
                 return manager.getCachedViews().get(position);
             }
             View item = inflater.inflate(R.layout.step_list_item, parent, false);
@@ -136,17 +165,22 @@ public class RecipeDescriptionActivity extends Activity {
             // Set info to fields from entity
             Step step = (Step) getItem(position);
             tvDescription.setText(step.getDescription());
-            if (step.getTime() != 0) {
+
+            // If recipe has timers and there are no started timer or timers
+            // belong to this recipe
+            if (step.getTime() != 0
+                    && (manager.getStartedRecipeId() == manager.getCurrentRecipe().getId()
+                    || manager.getStartedRecipeId() == Manager.NONE)) {
                 tvTimerLabel.setText(String.valueOf(step.getTime()));
                 if (manager.getIsTimerStarted().get(position)) {
-                    btnTimerControl.setText("Stop");
+                    btnTimerControl.setText(getString(R.string.btn_timer_control_stop));
                 } else {
-                    btnTimerControl.setText("Start");
+                    btnTimerControl.setText(getString(R.string.btn_timer_control_start));
                 }
                 btnTimerControl.setOnClickListener(new TimerButtonListener(position));
             } else {
-                tvTimerLabel.setVisibility(View.INVISIBLE);
-                btnTimerControl.setVisibility(View.INVISIBLE);
+                tvTimerLabel.setVisibility(View.GONE);
+                btnTimerControl.setVisibility(View.GONE);
             }
 
             // Cache info about view
@@ -161,6 +195,10 @@ public class RecipeDescriptionActivity extends Activity {
 
         private int position;
 
+        public TimerButtonListener() {
+
+        }
+
         public TimerButtonListener(int position) {
             this.position = position;
         }
@@ -168,22 +206,42 @@ public class RecipeDescriptionActivity extends Activity {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(RecipeDescriptionActivity.this, TimerService.class);
-            intent.putExtra(TimerService.ITEM_POSITION, position);
-            intent.putExtra(TimerService.ITEM_TIMER,
-                    ((Step) adapter.getItem(position)).getTime());
+            switch (v.getId()) {
 
-            if (manager.isTimerStarted(position)) {
-                Log.d(LOG_TAG, "Button #" + position + " pressed: stopping");
-                intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_STOP);
+            // If cancelAllTimers pressed
+            case R.id.btnCancelAllTimers:
+                intent.putExtra(TimerService.ITEM_ACTION, TimerService.ALL_TIMERS_STOP);
                 RecipeDescriptionActivity.this.startService(intent);
-                manager.getButton(position).setText("Start");
-                manager.setTimerStarted(position, Boolean.FALSE);
-            } else {
-                Log.d(LOG_TAG, "Button #" + position + " pressed: starting");
-                intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_START);
-                RecipeDescriptionActivity.this.startService(intent);
-                manager.getButton(position).setText("Stop");
-                manager.setTimerStarted(position, Boolean.TRUE);
+                btnCancelAllTimers.setEnabled(Boolean.FALSE);
+                break;
+
+            // If TimerControl pressed
+            default:
+                intent.putExtra(TimerService.ITEM_POSITION, position);
+                intent.putExtra(TimerService.ITEM_TIMER,
+                        ((Step) adapter.getItem(position)).getTime());
+                // Timer stop
+                if (manager.isTimerStarted(position)) {
+                    Log.d(LOG_TAG, "Button #" + position + " pressed: stopping");
+                    intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_STOP);
+                    RecipeDescriptionActivity.this.startService(intent);
+                    manager.getButton(position).setText(
+                            getString(R.string.btn_timer_control_start));
+                    manager.setTimerStarted(position, Boolean.FALSE);
+
+                    // Timer start
+                } else {
+                    Log.d(LOG_TAG, "Button #" + position + " pressed: starting");
+                    intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_START);
+                    RecipeDescriptionActivity.this.startService(intent);
+
+                    // Set started recipe
+                    manager.setStartedRecipeId(manager.getCurrentRecipe().getId());
+                    btnCancelAllTimers.setEnabled(Boolean.TRUE);
+                    Log.d(LOG_TAG, "Set cached Button");
+                    manager.getButton(position).setText(getString(R.string.btn_timer_control_stop));
+                    manager.setTimerStarted(position, Boolean.TRUE);
+                }
             }
         }
     }
