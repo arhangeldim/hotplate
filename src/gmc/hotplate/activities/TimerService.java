@@ -7,7 +7,6 @@
 
 package gmc.hotplate.activities;
 
-import gmc.hotplate.R;
 import gmc.hotplate.logic.Manager;
 
 import java.util.HashMap;
@@ -55,7 +54,7 @@ public class TimerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        cancelAllTimer();
+        stopAllTimers();
         Log.d(LOG_TAG, "Service destroyed. All time cancelled");
     }
 
@@ -67,25 +66,72 @@ public class TimerService extends Service {
         int seconds = bundle.getInt(ITEM_TIMER);
         Log.d(LOG_TAG, "Extras: action=" + action + ", pos=" + position + "sec=" + seconds);
         if (action == TIMER_START) {
-            defaultTimerSeconds.put(position, seconds);
-            final Runnable task = new UpdateViewTask(position, seconds);
-            Timer timer = new Timer();
-            timer.scheduleAtFixedRate(new TimerTask() {
-
-                @Override
-                public void run() {
-                    manager.getActivity().runOnUiThread(task);
-                }
-            }, 0, INTERVAL);
-            timers.put(position, timer);
+            startTimer(position, seconds);
         } else if (action == TIMER_STOP) {
-            cancelTimer(position, seconds);
+            stopTimer(position, seconds);
         } else if (action == ALL_TIMERS_STOP) {
-            cancelAllTimer();
+            stopAllTimers();
         } else {
-            cancelAllTimer();
+            stopAllTimers();
         }
         return super.onStartCommand(intent, flags, startId);
+    }
+
+    private void startTimer(int position, int seconds) {
+        manager.setBtnAllTimerCancelEnabled(Boolean.TRUE);
+        manager.setIsTimerStarted(position, Boolean.TRUE);
+        manager.setImageClockPressed(position, Boolean.TRUE);
+        defaultTimerSeconds.put(position, seconds);
+        final Runnable task = new UpdateViewTask(position, seconds);
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+
+            @Override
+            public void run() {
+                manager.getActivity().runOnUiThread(task);
+            }
+        }, 0, INTERVAL);
+        timers.put(position, timer);
+    }
+
+    private void stopTimer(int position, int seconds) {
+        Log.d(LOG_TAG, "cancel timer: pos = " + position + " timers.size() = " + timers.size());
+        manager.setIsTimerStarted(position, Boolean.FALSE);
+        timers.get(position).cancel();
+        manager.setElapsedTime(position, seconds);
+        manager.setImageClockPressed(position, Boolean.FALSE);
+        if (!manager.isAnyTimerStarted()) {
+            Log.d(LOG_TAG, "Set all field to default");
+            if (manager.getCurrentRecipe().getId() == manager.getStartedRecipeId()) {
+                manager.setBtnAllTimerCancelEnabled(Boolean.FALSE);
+            }
+            manager.setStartedRecipeId(Manager.NONE);
+            // If recipe is ended clear timers hash
+            timers.clear();
+            defaultTimerSeconds.clear();
+        }
+        Log.d(LOG_TAG, "Timer #" + position + " stopped");
+    }
+
+    private void stopAllTimers() {
+        Log.d(LOG_TAG, "timers size = " + timers.size());
+        for (Map.Entry<Integer, Timer> t : timers.entrySet()) {
+            Log.d(LOG_TAG, "Stopping timer #" + t.getKey() + " from " + timers.size());
+            if (t.getValue() != null) {
+                int position = t.getKey();
+                int seconds = defaultTimerSeconds.get(t.getKey());
+                manager.setIsTimerStarted(position, Boolean.FALSE);
+                timers.get(position).cancel();
+                manager.setElapsedTime(position, seconds);
+                manager.setImageClockPressed(position, Boolean.FALSE);
+            }
+        }
+        if (manager.getCurrentRecipe().getId() == manager.getStartedRecipeId()) {
+            manager.setBtnAllTimerCancelEnabled(Boolean.FALSE);
+        }
+        manager.setStartedRecipeId(Manager.NONE);
+        timers.clear();
+        defaultTimerSeconds.clear();
     }
 
     class UpdateViewTask implements Runnable {
@@ -102,48 +148,14 @@ public class TimerService extends Service {
 
         @Override
         public void run() {
-            manager.getCachedTextView(position).setText(String.valueOf(seconds));
+            manager.setElapsedTime(position, seconds);
             seconds--;
             if (seconds < 0) {
-                cancelTimer(position, defaultSeconds);
+                stopTimer(position, defaultSeconds);
                 Toast.makeText(manager.getActivity(),
                         "Timer #" + position + " ended", Toast.LENGTH_SHORT).show();
                 Log.d(LOG_TAG, "Toast notification: Timer #" + position + " ended");
             }
         }
-    }
-
-    public void cancelTimer(int position, int defaultSeconds) {
-        Log.d(LOG_TAG, "cancel timer: pos = " + position + " timers.size() = " + timers.size());
-        timers.get(position).cancel();
-        manager.getIsTimerStarted().set(position, Boolean.FALSE);
-        Log.d(LOG_TAG, "Timer #" + position + " stopped");
-        manager.getButton(position).setText(manager.getActivity()
-                .getString(R.string.btn_timer_control_start));
-        manager.getCachedTextView(position).setText(String.valueOf(defaultSeconds));
-        // If there are no started timers
-        if (!manager.isAnyTimerStarted()) {
-            Log.d(LOG_TAG, "Set all field to default");
-            if (manager.getCurrentRecipe().getId() == manager.getStartedRecipeId()) {
-                Log.d(LOG_TAG, "Set Button enabled to false");
-                ((RecipeDescriptionActivity) manager.getActivity()).getBtnCancelAllTimers()
-                        .setEnabled(Boolean.FALSE);
-            }
-            manager.setStartedRecipeId(Manager.NONE);
-
-            // If recipe is ended clear timers hash
-            timers.clear();
-            defaultTimerSeconds.clear();
-        }
-    }
-
-    public void cancelAllTimer() {
-        for (Map.Entry<Integer, Timer> t : timers.entrySet()) {
-            if (t.getValue() != null) {
-                int seconds = defaultTimerSeconds.get(t.getKey());
-                cancelTimer(t.getKey(), seconds);
-            }
-        }
-
     }
 }

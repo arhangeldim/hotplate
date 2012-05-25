@@ -1,34 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     android:orientation="vertical" >
-
-    <ImageView
-        android:id="@+id/ivRecipeIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher" />
 
     <TextView
         android:id="@+id/tvName"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="10dp"
-        android:layout_toRightOf="@+id/ivRecipeIcon"
+        android:textColor="@color/cblack"
         android:textSize="14dp" >
     </TextView>
 
     <TextView
-        android:id="@+id/tvDescr"
+        android:id="@+id/tvShortDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/tvName"
         android:layout_marginBottom="10dp"
-        android:layout_toRightOf="@+id/ivRecipeIcon"
-        android:textColor="#bbbbbb"
+        android:textColor="@color/cblack"
         android:textSize="12dp" >
     </TextView>
 
-</RelativeLayout>
+</LinearLayout>

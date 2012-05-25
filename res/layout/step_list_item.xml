@@ -1,30 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:gravity="right"
-    android:orientation="vertical" >
+    android:orientation="horizontal" >
 
-    <TextView
-        android:id="@+id/tvStepDescr"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </TextView>
+    <LinearLayout
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"
+        android:orientation="vertical" >
 
-    
+        <TextView
+            android:id="@+id/tvStepDescr"
+            android:textColor="@color/cblack"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </TextView>
+    </LinearLayout>
 
-    <TextView
-        android:id="@+id/tvTimerLabel"
-        android:layout_width="255dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_below="@+id/tvStepDescr" />
+    <LinearLayout
+        android:layout_width="40dp"
+        android:layout_height="70dp"
+        android:layout_weight="1"
+        android:gravity="right"
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/btnTimerControl"
-        android:layout_width="60dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/tvStepDescr"
-        android:layout_toRightOf="@+id/tvTimerLabel" />
+        <ImageView
+            android:src="@drawable/clock_normal"
+            android:padding="10dp"
+            android:id="@+id/ivTimerImage"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:text="top" >
+        </ImageView>
 
-</RelativeLayout>
+        <TextView
+            android:id="@+id/tvElapsedTime"
+            android:layout_width="match_parent"
+            android:layout_height="30dp"
+            android:gravity="center_horizontal"
+            android:text="bottom!" >
+        </TextView>
+        
+        
+    </LinearLayout>
+
+</LinearLayout>

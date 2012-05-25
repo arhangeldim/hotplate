@@ -8,8 +8,10 @@
 package gmc.hotplate.logic;
 
 import gmc.hotplate.R;
+import gmc.hotplate.activities.RecipeDescriptionActivity;
 import gmc.hotplate.entities.Recipe;
 import gmc.hotplate.entities.Step;
+import gmc.hotplate.util.Utils;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -28,9 +30,11 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public final class Manager {
@@ -41,14 +45,12 @@ public final class Manager {
     private Recipe currentRecipe;
     private int startedRecipeId;
     private Activity activity;
-    private List<TextView> cachedTextViews;
     private List<View> cachedViews;
     private List<Boolean> isCached = null;
     private List<Boolean> isTimerStarted = null;
 
     private Manager() {
         cachedViews = new ArrayList<View>();
-        cachedTextViews = new ArrayList<TextView>();
         startedRecipeId = NONE;
     }
 
@@ -57,10 +59,6 @@ public final class Manager {
             sInstance = new Manager();
         }
         return sInstance;
-    }
-
-    public TextView getCachedTextView(int position) {
-        return cachedTextViews.get(position);
     }
 
     public Boolean isTimerStarted(int position) {
@@ -78,7 +76,40 @@ public final class Manager {
         return result;
     }
 
-    public void setTimerStarted(int position, Boolean state) {
+
+    /*
+     * Set elapsed time text field
+     */
+    public void setElapsedTime(int position, int seconds) {
+        TextView v = (TextView) cachedViews.get(position).findViewById(R.id.tvElapsedTime);
+        v.setText(Utils.format(seconds));
+    }
+
+    public void setImageClockPressed(int position, Boolean pressed) {
+        ImageView iv = (ImageView) cachedViews.get(position).findViewById(R.id.ivTimerImage);
+        TextView tv = (TextView) cachedViews.get(position).findViewById(R.id.tvElapsedTime);
+        if (pressed) {
+            iv.setImageResource(R.drawable.clock_pressed);
+            tv.setTextColor(getActivity().getResources().getColor(R.color.orange));
+        } else {
+            iv.setImageResource(R.drawable.clock_normal);
+            tv.setTextColor(getActivity().getResources().getColor(R.color.palette_grey));
+        }
+    }
+
+    public void setBtnAllTimerCancelEnabled(Boolean enabled) {
+        Button btn = ((RecipeDescriptionActivity) getActivity()).getBtnCancelAllTimers();
+        btn.setEnabled(enabled);
+
+        // TODO(arhangeldim): HACK should get color through resources
+        if (enabled) {
+            btn.setTextColor(Color.BLACK);
+        } else {
+            btn.setTextColor(Color.GRAY);
+        }
+    }
+
+    public void setIsTimerStarted(int position, Boolean state) {
         isTimerStarted.set(position, state);
     }
 
@@ -106,14 +137,6 @@ public final class Manager {
         this.activity = activity;
     }
 
-    public List<TextView> getCachedTextViews() {
-        return cachedTextViews;
-    }
-
-    public void setCachedTextViews(List<TextView> cachedTextViews) {
-        this.cachedTextViews = cachedTextViews;
-    }
-
     public List<View> getCachedViews() {
         return cachedViews;
     }
@@ -122,20 +145,12 @@ public final class Manager {
         this.cachedViews = cachedViews;
     }
 
-    public Button getButton(int position) {
-        return (Button) cachedViews.get(position).findViewById(R.id.btnTimerControl);
-    }
-
     public List<Boolean> getIsCached() {
         return isCached;
     }
 
     public void setIsCached(List<Boolean> isCached) {
         this.isCached = isCached;
-    }
-
-    public List<Boolean> getIsTimerStarted() {
-        return isTimerStarted;
     }
 
     public void setIsTimerStarted(List<Boolean> isTimerStarted) {

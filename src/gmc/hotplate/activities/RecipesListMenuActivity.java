@@ -21,6 +21,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
@@ -38,6 +39,16 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //Remove title bar
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+
+        /*
+        //Remove notification bar
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        */
+
         setContentView(R.layout.recipe_list);
         Log.d(LOG_TAG, "Created RecipesListMenyActivity");
         dbManager = DatabaseManager.getInstance(this);
@@ -111,7 +122,7 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
 
         RecipeItemHolder(View item) {
             tvName = (TextView) item.findViewById(R.id.tvName);
-            tvDescr = (TextView) item.findViewById(R.id.tvDescr);
+            tvDescr = (TextView) item.findViewById(R.id.tvShortDescription);
         }
 
         void populateFrom(Recipe recipe) {
