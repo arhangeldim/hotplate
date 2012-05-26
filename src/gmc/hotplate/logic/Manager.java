@@ -44,6 +44,7 @@ public final class Manager {
     private Recipe currentRecipe;
     private int startedRecipeId;
     private Activity activity;
+    private Activity logoScreen;
     private List<View> cachedViews;
     private List<Boolean> isCached = null;
     private List<Boolean> isTimerStarted = null;
@@ -95,8 +96,9 @@ public final class Manager {
             iv.setImageResource(R.drawable.clock_pressed);
             tv.setTextColor(getActivity().getResources().getColor(R.color.orange));
         } else {
+            Log.d(LOG_TAG, "Set image normal");
             iv.setImageResource(R.drawable.clock_normal);
-            tv.setTextColor(getActivity().getResources().getColor(R.color.palette_grey));
+            tv.setTextColor(getActivity().getResources().getColor(R.color.palette_gray));
         }
     }
 
@@ -110,12 +112,20 @@ public final class Manager {
         if (enabled) {
             btn.setTextColor(activity.getResources().getColor(R.color.cblack));
         } else {
-            btn.setTextColor(activity.getResources().getColor(R.color.palette_grey));
+            btn.setTextColor(activity.getResources().getColor(R.color.palette_gray));
         }
     }
 
     public void setIsTimerStarted(int position, Boolean state) {
         isTimerStarted.set(position, state);
+    }
+
+    public Activity getLogoScreen() {
+        return logoScreen;
+    }
+
+    public void setLogoScreen(Activity logoScreen) {
+        this.logoScreen = logoScreen;
     }
 
     public Recipe getCurrentRecipe() {

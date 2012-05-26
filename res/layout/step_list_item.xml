@@ -12,9 +12,10 @@
 
         <TextView
             android:id="@+id/tvStepDescr"
-            android:textColor="@color/cblack"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textColor="@color/simple_text" >
         </TextView>
     </LinearLayout>
 
@@ -26,23 +27,17 @@
         android:orientation="vertical" >
 
         <ImageView
-            android:src="@drawable/clock_normal"
-            android:padding="10dp"
             android:id="@+id/ivTimerImage"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:text="top" >
-        </ImageView>
+            android:padding="10dp" />
 
         <TextView
             android:id="@+id/tvElapsedTime"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:gravity="center_horizontal"
-            android:text="bottom!" >
+            android:gravity="center_horizontal" >
         </TextView>
-        
-        
     </LinearLayout>
 
 </LinearLayout>

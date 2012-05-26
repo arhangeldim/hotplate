@@ -8,39 +8,36 @@
 package gmc.hotplate.activities;
 
 import gmc.hotplate.R;
+import gmc.hotplate.logic.Manager;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 
-public class HotplateActivity extends Activity implements OnClickListener {
+public class HotplateActivity extends Activity {
 
     private static final String LOG_TAG = HotplateActivity.class.getName();
-    private Button btnRecipeList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-        btnRecipeList = (Button) findViewById(R.id.btnRecipeList);
-        btnRecipeList.setOnClickListener(this);
         Log.d(LOG_TAG, "Created HotplateActivity");
+        Timer timer = new Timer();
+        Manager.getInstance().setLogoScreen(this);
+        timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                HotplateActivity.this.startActivity(
+                        new Intent(HotplateActivity.this, RecipesListMenuActivity.class));
+            }
+        }, Integer.parseInt(getResources().getString(R.string.screen_delay)));
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.btnRecipeList:
-                Intent intent = new Intent(this, RecipesListMenuActivity.class);
-                startActivity(intent);
-                break;
-            default:
-                break;
-
-        }
-    }
 
 }

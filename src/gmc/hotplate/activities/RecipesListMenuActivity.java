@@ -33,7 +33,7 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
     private static final String LOG_TAG = RecipesListMenuActivity.class.getName();
     public static final int QUERY_LIMIT = 10;
     private IDataManager dbManager;
-    private Manager recipeManager;
+    private Manager manager;
     private ListView lvRecipes;
 
     @Override
@@ -52,7 +52,7 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
         setContentView(R.layout.recipe_list);
         Log.d(LOG_TAG, "Created RecipesListMenyActivity");
         dbManager = DatabaseManager.getInstance(this);
-        recipeManager = Manager.getInstance();
+        manager = Manager.getInstance();
         lvRecipes = (ListView) findViewById(R.id.lvRecipes);
 
         List<Recipe> recipes = dbManager.getRecipes(QUERY_LIMIT);
@@ -62,12 +62,18 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
     }
 
     @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        manager.getLogoScreen().finish();
+    }
+
+    @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         Object selected = parent.getAdapter().getItem(position);
         if (selected instanceof Recipe) {
             Recipe recipe = (Recipe) selected;
             Log.d(LOG_TAG, "Selected recipe name: " + recipe.getName());
-            recipeManager.setCurrentRecipe(recipe);
+            manager.setCurrentRecipe(recipe);
         }
         Intent intent = new Intent(RecipesListMenuActivity.this,
                 RecipeDescriptionActivity.class);

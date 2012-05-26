@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    
+    <!-- COLORS -->
+
+    
+    <color name="orange">#ffff5a00</color>
+    <color name="cwhite">#ffffffff</color>
+    <color name="cblack">#ff000000</color>
+    <color name="light_gray">#ff333333</color>
+    <color name="palette_gray">#ff7e7e7e</color>
+    <color name="light_orange">#fff69233</color>
+    
+    
+    
+    
+    <!-- END COLORS -->
+    
+    
+    <color name="background">#ffffffff</color>
+    <color name="simple_text">#ff3c3c3c</color>
+    
+    <color name="view_selected">#ffcccccc</color>
+    <color name="view_pressed">#ffaaaaaa</color>
+    
+    <drawable name="dtransparent">#00000000</drawable>
+    <drawable name="dwhite">#ffffffff</drawable>
+    <drawable name="dgray">#ff7e7e7e</drawable>
+</resources>

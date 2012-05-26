@@ -6,6 +6,7 @@
     <string name="app_name">Hotplate</string>
     <string name="db_name">hotplateDB</string>
     <string name="db_version">1</string>
+    <string name="screen_delay">1700</string>
     
     <!-- END PROPERTIES -->
     
@@ -32,15 +33,8 @@
     <!-- End DIALOG -->
 
 
-    <!-- COLORS -->
-
-    <color name="background">#fff9ea99</color>
-    <color name="orange">#ffff5a00</color>
-    <color name="cwhite">#ffffffff</color>
-    <color name="cblack">#ff000000</color>
-    <color name="light_grey">#ffbbbbbb</color>
-    <color name="palette_grey">#ff7e7e7e</color>
     
-    <!-- END COLORS -->
+    
+    
 
 </resources>

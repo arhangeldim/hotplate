@@ -8,18 +8,21 @@
     <TextView
         android:id="@+id/tvName"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/cblack"
-        android:textSize="14dp" >
+        android:layout_height="20dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:textColor="@color/light_orange"
+        android:textSize="14dp"
+        android:textStyle="bold" >
     </TextView>
 
     <TextView
         android:id="@+id/tvShortDescription"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:textColor="@color/cblack"
+        android:layout_height="40dp"
+        android:layout_marginBottom="5dp"
+        android:padding="5dp"
+        android:textColor="@color/palette_gray"
         android:textSize="12dp" >
     </TextView>
 
