@@ -30,7 +30,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import android.app.Activity;
-import android.graphics.Color;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -85,6 +84,10 @@ public final class Manager {
         v.setText(Utils.format(seconds));
     }
 
+    /*
+     * Set color of elapsed time and clock image
+     * when timer is running
+     */
     public void setImageClockPressed(int position, Boolean pressed) {
         ImageView iv = (ImageView) cachedViews.get(position).findViewById(R.id.ivTimerImage);
         TextView tv = (TextView) cachedViews.get(position).findViewById(R.id.tvElapsedTime);
@@ -97,15 +100,17 @@ public final class Manager {
         }
     }
 
+    /*
+     * Set enabled for button
+     * Set different colors for enabled / disabled button
+     */
     public void setBtnAllTimerCancelEnabled(Boolean enabled) {
         Button btn = ((RecipeDescriptionActivity) getActivity()).getBtnCancelAllTimers();
         btn.setEnabled(enabled);
-
-        // TODO(arhangeldim): HACK should get color through resources
         if (enabled) {
-            btn.setTextColor(Color.BLACK);
+            btn.setTextColor(activity.getResources().getColor(R.color.cblack));
         } else {
-            btn.setTextColor(Color.GRAY);
+            btn.setTextColor(activity.getResources().getColor(R.color.palette_grey));
         }
     }
 

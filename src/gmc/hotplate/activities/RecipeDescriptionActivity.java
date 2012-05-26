@@ -144,7 +144,7 @@ public class RecipeDescriptionActivity extends Activity {
 
             // Stop all timers
             case Dialog.BUTTON_NEGATIVE:
-                intent.putExtra(TimerService.ITEM_ACTION, TimerService.ALL_TIMERS_STOP);
+                intent.putExtra(TimerService.ITEM_ACTION, TimerService.STOP_ALL_TIMERS);
                 RecipeDescriptionActivity.this.startService(intent);
                 manager.setBtnAllTimerCancelEnabled(Boolean.FALSE);
                 RecipeDescriptionActivity.this.finish();
@@ -216,9 +216,8 @@ public class RecipeDescriptionActivity extends Activity {
             }
             View item = inflater.inflate(R.layout.step_list_item, parent, false);
             TextView tvDescription = (TextView) item.findViewById(R.id.tvStepDescr);
-            // Button <-> TextView
             ImageView ivTimerControl = (ImageView) item.findViewById(R.id.ivTimerImage);
-            TextView tvTimerLabel = (TextView) item.findViewById(R.id.tvElapsedTime);
+            TextView tvElapsedTime = (TextView) item.findViewById(R.id.tvElapsedTime);
 
             // Set info to fields from entity
             Step step = (Step) getItem(position);
@@ -235,17 +234,16 @@ public class RecipeDescriptionActivity extends Activity {
                     || manager.getStartedRecipeId() == Manager.NONE)) {
                 if (manager.isTimerStarted(position)) {
                     manager.setImageClockPressed(position, Boolean.TRUE);
-                    Log.d(LOG_TAG, "set stop");
+                    Log.d(LOG_TAG, "Timers are running already.");
                 } else {
                     manager.setImageClockPressed(position, Boolean.FALSE);
-                    Log.d(LOG_TAG, "set start");
                 }
-                tvTimerLabel.setText(Utils.format(step.getTime()));
+                tvElapsedTime.setText(Utils.format(step.getTime()));
                 View.OnClickListener listener = new TimerControlListener(position);
-                tvTimerLabel.setOnClickListener(listener);
+                tvElapsedTime.setOnClickListener(listener);
                 ivTimerControl.setOnClickListener(listener);
             } else {
-                tvTimerLabel.setVisibility(View.GONE);
+                tvElapsedTime.setVisibility(View.GONE);
                 ivTimerControl.setVisibility(View.GONE);
             }
             return item;
@@ -271,7 +269,7 @@ public class RecipeDescriptionActivity extends Activity {
 
             // If cancelAllTimers pressed
             case R.id.btnCancelAllTimers:
-                intent.putExtra(TimerService.ITEM_ACTION, TimerService.ALL_TIMERS_STOP);
+                intent.putExtra(TimerService.ITEM_ACTION, TimerService.STOP_ALL_TIMERS);
                 RecipeDescriptionActivity.this.startService(intent);
                 break;
 
@@ -284,13 +282,13 @@ public class RecipeDescriptionActivity extends Activity {
                 // Timer stop
                 if (manager.isTimerStarted(position)) {
                     Log.d(LOG_TAG, "Button #" + position + " pressed: stopping");
-                    intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_STOP);
+                    intent.putExtra(TimerService.ITEM_ACTION, TimerService.STOP_TIMER);
                     RecipeDescriptionActivity.this.startService(intent);
 
                 // Timer start
                 } else {
                     Log.d(LOG_TAG, "Button #" + position + " pressed: starting");
-                    intent.putExtra(TimerService.ITEM_ACTION, TimerService.TIMER_START);
+                    intent.putExtra(TimerService.ITEM_ACTION, TimerService.START_TIMER);
                     RecipeDescriptionActivity.this.startService(intent);
 
                     // Set started recipe

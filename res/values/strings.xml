@@ -1,14 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <!-- PROPERTIES -->
+    
     <string name="app_name">Hotplate</string>
     <string name="db_name">hotplateDB</string>
-    <string name="menu_recipe_label">Список Рецептов</string>
     <string name="db_version">1</string>
+    
+    <!-- END PROPERTIES -->
+    
+    
+    <!-- LABELS -->
+    
+    <string name="menu_recipe_label">Список Рецептов</string>
     <string name="recipe_list_menu_label">Кулинарная книга</string>
     <string name="btn_cancel_all_timers">Отменить все таймеры</string>
     <string name="btn_timer_control_start">Старт</string>
     <string name="btn_timer_control_stop">Стоп</string>
+    
+    <!-- END LABELS -->
+    
+
+    <!-- DIALOG "Clos recipe" -->
+
+    <string name="timer_dialog_title">Вы покидаете рецепт</string>
+    <string name="timer_dialog_message">Напомнить о таймерах?</string>
+    <string name="timer_dialog_positive">Да</string>
+    <string name="timer_dialog_negative">Нет</string>
+    <string name="timer_dialog_neutral">Отмена</string>
+
+    <!-- End DIALOG -->
+
+
+    <!-- COLORS -->
+
     <color name="background">#fff9ea99</color>
     <color name="orange">#ffff5a00</color>
     <color name="cwhite">#ffffffff</color>
@@ -16,9 +41,6 @@
     <color name="light_grey">#ffbbbbbb</color>
     <color name="palette_grey">#ff7e7e7e</color>
     
-    <string name="timer_dialog_title">Вы покидаете рецепт</string>
-    <string name="timer_dialog_message">Напомнить о таймерах?</string>
-    <string name="timer_dialog_positive">Да</string>
-    <string name="timer_dialog_negative">Нет</string>
-    <string name="timer_dialog_neutral">Отмена</string>
+    <!-- END COLORS -->
+
 </resources>

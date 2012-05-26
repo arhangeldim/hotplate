@@ -27,9 +27,9 @@ public class TimerService extends Service {
     public static final String ITEM_ACTION = "item_action";
     public static final String ITEM_POSITION = "item_position";
     public static final String ITEM_TIMER = "item_timer";
-    public static final int TIMER_START = 0;
-    public static final int TIMER_STOP = 1;
-    public static final int ALL_TIMERS_STOP = 2;
+    public static final int START_TIMER = 0;
+    public static final int STOP_TIMER = 1;
+    public static final int STOP_ALL_TIMERS = 2;
     public static final int INTERVAL = 1000;
 
     private Manager manager;
@@ -65,11 +65,11 @@ public class TimerService extends Service {
         int action = bundle.getInt(ITEM_ACTION);
         int seconds = bundle.getInt(ITEM_TIMER);
         Log.d(LOG_TAG, "Extras: action=" + action + ", pos=" + position + "sec=" + seconds);
-        if (action == TIMER_START) {
+        if (action == START_TIMER) {
             startTimer(position, seconds);
-        } else if (action == TIMER_STOP) {
+        } else if (action == STOP_TIMER) {
             stopTimer(position, seconds);
-        } else if (action == ALL_TIMERS_STOP) {
+        } else if (action == STOP_ALL_TIMERS) {
             stopAllTimers();
         } else {
             stopAllTimers();
