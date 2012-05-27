@@ -99,6 +99,19 @@ public class RecipeDescriptionActivity extends Activity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        manager.setActivity(this);
+        Log.d(LOG_TAG, "onStart()");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(LOG_TAG, "onStop()");
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
     }
@@ -288,11 +301,11 @@ public class RecipeDescriptionActivity extends Activity {
                 // Timer start
                 } else {
                     Log.d(LOG_TAG, "Button #" + position + " pressed: starting");
-                    intent.putExtra(TimerService.ITEM_ACTION, TimerService.START_TIMER);
-                    RecipeDescriptionActivity.this.startService(intent);
 
                     // Set started recipe
                     manager.setStartedRecipeId(manager.getCurrentRecipe().getId());
+                    intent.putExtra(TimerService.ITEM_ACTION, TimerService.START_TIMER);
+                    RecipeDescriptionActivity.this.startService(intent);
                 }
             }
         }

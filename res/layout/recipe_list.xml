@@ -2,40 +2,59 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/background"
-    android:orientation="vertical" >
+    android:background="@drawable/repeating_bg"
+    android:orientation="vertical"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp"
+    android:paddingBottom="40dp" >
 
-    <ImageView
-        android:id="@+id/ivTimerImage"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="left"
-        android:paddingTop="10dp"
-        android:paddingLeft="15dp"
-        android:paddingBottom="5dp"
-        android:src="@drawable/header" />
-    
-    <ImageView 
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="5dp"
-        android:src="@drawable/delimiter"/>
-        
+        android:background="@drawable/repeating_bg"
+        android:orientation="vertical" >
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="@string/recipe_list_menu_label"
-        android:textColor="@color/light_gray" />
+        <ImageView
+            android:id="@+id/ivTimerImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:paddingBottom="10dp"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:src="@drawable/header" />
 
-    <ListView
-        android:id="@+id/lvRecipes"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:listSelector="@color/background"
-        android:layout_marginTop="10dp"
-        android:cacheColorHint="#00000000" >
-    </ListView>
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:src="@drawable/delimiter" />
+    </LinearLayout>
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/background"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="@string/recipe_list_menu_label"
+            android:textColor="@color/light_gray" />
+
+        <ListView
+            android:id="@+id/lvRecipes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="10dp"
+            android:cacheColorHint="#00000000"
+            android:listSelector="#00000000" >
+        </ListView>
+    </LinearLayout>
 
 </LinearLayout>

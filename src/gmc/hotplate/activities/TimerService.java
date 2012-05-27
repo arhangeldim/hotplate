@@ -7,6 +7,7 @@
 
 package gmc.hotplate.activities;
 
+import gmc.hotplate.R;
 import gmc.hotplate.logic.Manager;
 
 import java.util.HashMap;
@@ -14,7 +15,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -36,6 +39,7 @@ public class TimerService extends Service {
     private Map<Integer, Timer> timers;
     // Default value for timer on positoin <position, seconds>
     private Map<Integer, Integer> defaultTimerSeconds;
+    private Notificator notificator;
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -49,6 +53,7 @@ public class TimerService extends Service {
         timers = new HashMap<Integer, Timer>();
         defaultTimerSeconds = new HashMap<Integer, Integer>();
         manager = Manager.getInstance();
+        notificator = new Notificator(manager.getActivity());
     }
 
     @Override
@@ -64,7 +69,8 @@ public class TimerService extends Service {
         int position = bundle.getInt(ITEM_POSITION);
         int action = bundle.getInt(ITEM_ACTION);
         int seconds = bundle.getInt(ITEM_TIMER);
-        Log.d(LOG_TAG, "Extras: action=" + action + ", pos=" + position + "sec=" + seconds);
+        Log.d(LOG_TAG, "Extras: action=" + action + ", pos=" + position
+                + "sec=" + seconds);
         if (action == START_TIMER) {
             startTimer(position, seconds);
         } else if (action == STOP_TIMER) {
@@ -95,14 +101,16 @@ public class TimerService extends Service {
     }
 
     private void stopTimer(int position, int seconds) {
-        Log.d(LOG_TAG, "cancel timer: pos = " + position + " timers.size() = " + timers.size());
+        Log.d(LOG_TAG, "cancel timer: pos = " + position + " timers.size() = "
+                + timers.size());
         manager.setIsTimerStarted(position, Boolean.FALSE);
         timers.get(position).cancel();
         manager.setElapsedTime(position, seconds);
         manager.setImageClockPressed(position, Boolean.FALSE);
         if (!manager.isAnyTimerStarted()) {
             Log.d(LOG_TAG, "Set all field to default");
-            if (manager.getCurrentRecipe().getId() == manager.getStartedRecipeId()) {
+            if (manager.getCurrentRecipe().getId() == manager
+                    .getStartedRecipeId()) {
                 manager.setBtnAllTimerCancelEnabled(Boolean.FALSE);
             }
             manager.setStartedRecipeId(Manager.NONE);
@@ -116,7 +124,8 @@ public class TimerService extends Service {
     private void stopAllTimers() {
         Log.d(LOG_TAG, "timers size = " + timers.size());
         for (Map.Entry<Integer, Timer> t : timers.entrySet()) {
-            Log.d(LOG_TAG, "Stopping timer #" + t.getKey() + " from " + timers.size());
+            Log.d(LOG_TAG,
+                    "Stopping timer #" + t.getKey() + " from " + timers.size());
             if (t.getValue() != null) {
                 int position = t.getKey();
                 int seconds = defaultTimerSeconds.get(t.getKey());
@@ -132,6 +141,23 @@ public class TimerService extends Service {
         manager.setStartedRecipeId(Manager.NONE);
         timers.clear();
         defaultTimerSeconds.clear();
+    }
+
+    private void doNotification() {
+        Context context = manager.getActivity();
+        Notificator.Builder builder = new Notificator.Builder(context);
+        PendingIntent pIntent = PendingIntent.getActivity(context, 0,
+                new Intent(context, RecipesListMenuActivity.class), 0);
+        builder.setContentText("Шаг завершен")
+                .setContentTitle("Уведомление")
+                .setIcon(R.drawable.icon_notification)
+                .setTicker("Шаг завершен")
+                .setWhen(System.currentTimeMillis())
+                .setContentIntent(pIntent)
+                .autoCancel(Boolean.TRUE);
+
+        notificator.doNotification(builder.buildNotification());
+
     }
 
     class UpdateViewTask implements Runnable {
@@ -151,10 +177,13 @@ public class TimerService extends Service {
             manager.setElapsedTime(position, seconds);
             seconds--;
             if (seconds < 0) {
+                doNotification();
                 stopTimer(position, defaultSeconds);
                 Toast.makeText(manager.getActivity(),
-                        "Timer #" + position + " ended", Toast.LENGTH_SHORT).show();
-                Log.d(LOG_TAG, "Toast notification: Timer #" + position + " ended");
+                        "Timer #" + position + " ended", Toast.LENGTH_SHORT)
+                        .show();
+                Log.d(LOG_TAG, "Toast notification: Timer #" + position
+                        + " ended");
             }
         }
     }

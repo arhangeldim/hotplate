@@ -61,6 +61,15 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
         lvRecipes.setOnItemClickListener(this);
     }
 
+    
+    
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
