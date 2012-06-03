@@ -1,4 +1,11 @@
-package gmc.hotplate.activities;
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ *
+ * project: Hotplate
+ */
+
+package gmc.hotplate.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +35,7 @@ public class Notificator {
         return lastId++;
     }
 
-    static class Builder {
+    public static class Builder {
         private Context context;
         private Notification notification;
         private String contentText;

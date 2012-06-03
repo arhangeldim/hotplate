@@ -11,13 +11,12 @@ import gmc.hotplate.R;
 import gmc.hotplate.entities.Recipe;
 import gmc.hotplate.logic.DatabaseManager;
 import gmc.hotplate.logic.IDataManager;
-import gmc.hotplate.logic.Manager;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,12 +27,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-public class RecipesListMenuActivity extends Activity implements OnItemClickListener {
+public class RecipesListMenuActivity extends ParentActivity implements OnItemClickListener {
 
     private static final String LOG_TAG = RecipesListMenuActivity.class.getName();
     public static final int QUERY_LIMIT = 10;
     private IDataManager dbManager;
-    private Manager manager;
     private ListView lvRecipes;
 
     @Override
@@ -41,18 +39,9 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
         super.onCreate(savedInstanceState);
         //Remove title bar
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        /*
-        //Remove notification bar
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        */
-
         setContentView(R.layout.recipe_list);
         Log.d(LOG_TAG, "Created RecipesListMenyActivity");
         dbManager = DatabaseManager.getInstance(this);
-        manager = Manager.getInstance();
         lvRecipes = (ListView) findViewById(R.id.lvRecipes);
 
         List<Recipe> recipes = dbManager.getRecipes(QUERY_LIMIT);
@@ -61,11 +50,10 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
         lvRecipes.setOnItemClickListener(this);
     }
 
-    
-    
     @Override
     protected void onStart() {
         super.onStart();
+        manager.setCurrentRecipe(null);
     }
 
 
@@ -73,7 +61,7 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        manager.getLogoScreen().finish();
+        manager.getLogoActivity().finish();
     }
 
     @Override
@@ -144,5 +132,31 @@ public class RecipesListMenuActivity extends Activity implements OnItemClickList
             tvName.setText(recipe.getName());
             tvDescr.setText(recipe.getDescription());
         }
+    }
+
+    @Override
+    public void setDefault() {
+        // TODO Auto-generated method stub
+    }
+
+
+
+    @Override
+    public void setActive() {
+        // TODO Auto-generated method stub
+    }
+
+
+
+    @Override
+    public void setInactive() {
+        // TODO Auto-generated method stub
+    }
+
+
+
+    @Override
+    public void update(Message msg) {
+        // TODO Auto-generated method stub
     }
 }

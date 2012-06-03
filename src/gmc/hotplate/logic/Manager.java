@@ -30,6 +30,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import android.app.Activity;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -52,6 +53,11 @@ public final class Manager {
     private Manager() {
         cachedViews = new ArrayList<View>();
         startedRecipeId = NONE;
+    }
+    
+    
+    public Handler getHandler() {
+        return new Handler();
     }
 
     public static synchronized Manager getInstance() {
@@ -106,15 +112,7 @@ public final class Manager {
      * Set enabled for button
      * Set different colors for enabled / disabled button
      */
-    public void setBtnAllTimerCancelEnabled(Boolean enabled) {
-        Button btn = ((RecipeDescriptionActivity) getActivity()).getBtnCancelAllTimers();
-        btn.setEnabled(enabled);
-        if (enabled) {
-            btn.setTextColor(activity.getResources().getColor(R.color.cblack));
-        } else {
-            btn.setTextColor(activity.getResources().getColor(R.color.palette_gray));
-        }
-    }
+   
 
     public void setIsTimerStarted(int position, Boolean state) {
         isTimerStarted.set(position, state);
@@ -193,7 +191,6 @@ public final class Manager {
                 } else if (current.getNodeName().equals("time")) {
                     step.setTime(Integer.parseInt(current.getTextContent().trim()));
                 } else {
-                    Log.d(LOG_TAG, "Xml Parsing. Undefining node: " + current.getNodeName());
                 }
             }
             stepList.add(step);
