@@ -15,12 +15,6 @@ import java.util.Map;
 
 public interface IDataManager {
 
-    Recipe[] getRecipes(Ingredient ingridient, int categoryId, int limit);
-
-    Recipe[] getRecipes(Ingredient ingridient, int limit);
-
-    Recipe[] getRecipes(int categoryId, int limit);
-
     List<Recipe> getRecipes(int limit);
 
     List<Ingredient> getProductsList(int type, int limit);
@@ -28,8 +22,6 @@ public interface IDataManager {
     Map<Ingredient, Float> getIngredients(int recipeId);
 
     Recipe getRecipeById(int id);
-
-    Ingredient getProductById(int id);
 
     void close();
 

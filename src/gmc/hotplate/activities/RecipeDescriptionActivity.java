@@ -54,6 +54,7 @@ public class RecipeDescriptionActivity extends ParentActivity {
         setContentView(R.layout.recipe_description);
 
         tvRecipeName = (TextView) findViewById(R.id.tvRecipeName);
+        tvRecipeName.setTypeface(robotoCondensed);
         tvIngredients = (TextView) findViewById(R.id.tvRecipeIngredients);
         lvSteps = (ListView) findViewById(R.id.lvSteps);
         btnCancelAll = (Button) findViewById(R.id.btnCancelAllTimers);
@@ -202,6 +203,7 @@ public class RecipeDescriptionActivity extends ParentActivity {
             // Set info to fields from entity
             Step step = (Step) getItem(position);
             tvDescription.setText(step.getDescription());
+            tvDescription.setTypeface(robotoRegular);
             views.put(position, item);
             updateControlState(position);
             return item;

@@ -9,12 +9,16 @@ package gmc.hotplate.activities;
 
 import gmc.hotplate.logic.AppManager;
 import android.app.Activity;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Message;
 
 public abstract class ParentActivity extends Activity {
 
     protected AppManager manager;
+    protected Typeface robotoLight;
+    protected Typeface robotoRegular;
+    protected Typeface robotoCondensed;
 
     private static final String LOG_TAG = ParentActivity.class.getName();
 
@@ -30,6 +34,9 @@ public abstract class ParentActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         manager = AppManager.getInstance();
+        robotoLight = Typeface.createFromAsset(getAssets(), "Roboto-Light.ttf");
+        robotoRegular = Typeface.createFromAsset(getAssets(), "Roboto-Regular.ttf");
+        robotoCondensed = Typeface.createFromAsset(getAssets(), "Roboto-Condensed.ttf");
     }
 
     @Override

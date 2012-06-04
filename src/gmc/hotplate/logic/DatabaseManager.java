@@ -129,13 +129,6 @@ public final class DatabaseManager implements IDataManager {
         return null;
     }
 
-    @Override
-    public Ingredient getProductById(int id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
     private class DBHelper extends SQLiteOpenHelper {
 
         private static final String LOG_TAG = "DBHelper";
@@ -335,7 +328,7 @@ public final class DatabaseManager implements IDataManager {
                 db.insert("recipes", null, cv);
             }
 
-            for (int i = 0 ; i < ingredientAmount.length; i++){
+            for (int i = 0; i < ingredientAmount.length; i++) {
                 cv.clear();
                 cv.put("recipe_id", ingredientsRecipe[i]);
                 cv.put("product_id", ingredientsProduct[i]);
@@ -347,25 +340,6 @@ public final class DatabaseManager implements IDataManager {
             Log.d(LOG_TAG, "  Tables created");
         }
 
-    }
-
-
-    @Override
-    public Recipe[] getRecipes(Ingredient ingridient, int categoryId, int limit) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Recipe[] getRecipes(Ingredient ingridient, int limit) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Recipe[] getRecipes(int categoryId, int limit) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

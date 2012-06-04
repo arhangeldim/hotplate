@@ -41,10 +41,12 @@
         android:orientation="vertical" >
 
         <TextView
+            android:id="@+id/tvRecipeMenu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="@string/recipe_list_menu_label"
+            android:textSize="16dp"
             android:textColor="@color/light_gray" />
 
         <ListView

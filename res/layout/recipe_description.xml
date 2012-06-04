@@ -2,50 +2,63 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="@color/background"
-    android:orientation="vertical" >
+    android:background="@drawable/repeating_bg"
+    android:orientation="vertical"
+    android:paddingBottom="10dp"
+    android:paddingLeft="5dp"
+    android:paddingRight="5dp" >
 
     <TextView
         android:id="@+id/tvRecipeName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:textSize="14dp"
+        android:layout_marginTop="10dp"
         android:gravity="center"
+        android:text=""
         android:textColor="@color/orange"
-        android:text="" />
+        android:textSize="16dp" />
 
     <TextView
         android:id="@+id/tvRecipeIngredients"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:textColor="@color/cblack"
-        android:text="" />
-    
-    <ImageView 
+        android:text=""
+        android:textColor="@color/cblack" />
+
+    <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:src="@drawable/delimiter"/>
+        android:src="@drawable/delimiter" />
 
-    <ListView
-        android:id="@+id/lvSteps"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:cacheColorHint="#00000000"
-        android:listSelector="@color/background"
-        android:layout_weight="1" >
-    </ListView>
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:background="@color/background"
+        android:orientation="vertical" >
 
-    <Button
+        <ListView
+            android:id="@+id/lvSteps"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:cacheColorHint="#00000000"
+            android:listSelector="#00000000" >
+        </ListView>
+        
+        <Button
         android:id="@+id/btnCancelAllTimers"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:layout_gravity="bottom"
-        android:textColor="@color/cblack"
         android:enabled="false"
-        android:text="@string/btn_cancel_all_timers" />
+        android:text="@string/btn_cancel_all_timers"
+        android:textColor="@color/cblack" />
+    </LinearLayout>
+
+    
 
 </LinearLayout>

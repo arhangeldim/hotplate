@@ -15,6 +15,7 @@ import gmc.hotplate.logic.IDataManager;
 import java.util.List;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
@@ -33,6 +34,7 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
     public static final int QUERY_LIMIT = 10;
     private IDataManager dbManager;
     private ListView lvRecipes;
+    
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,6 +44,10 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
         setContentView(R.layout.recipe_list);
         Log.d(LOG_TAG, "Created RecipesListMenyActivity");
         dbManager = DatabaseManager.getInstance(this);
+        TextView tvRecipeMenu = (TextView) findViewById(R.id.tvRecipeMenu);
+        tvRecipeMenu.setTypeface(robotoLight);
+        
+        
         lvRecipes = (ListView) findViewById(R.id.lvRecipes);
 
         List<Recipe> recipes = dbManager.getRecipes(QUERY_LIMIT);
@@ -61,6 +67,7 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+        manager.cancelNotification();
         manager.getLogoActivity().finish();
     }
 
@@ -119,7 +126,7 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
         }
     }
 
-    static class RecipeItemHolder {
+    class RecipeItemHolder {
         private TextView tvName;
         private TextView tvDescr;
 
@@ -131,6 +138,8 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
         void populateFrom(Recipe recipe) {
             tvName.setText(recipe.getName());
             tvDescr.setText(recipe.getDescription());
+            tvDescr.setTypeface(robotoRegular);
+            tvName.setTypeface(robotoCondensed);
         }
     }
 

@@ -16,7 +16,11 @@ import gmc.hotplate.util.AlarmReciver;
 import gmc.hotplate.util.Notificator;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -37,6 +41,10 @@ public final class AppManager {
     private Recipe currentRecipe;
     private Recipe startedRecipe;
     private List<Boolean> isTimerStarted;
+    private Map<Integer, Long> alarms;
+    private MapValueComparator comparator;
+    private Notificator notificator;
+    private AlarmReciver alarmReciver = new AlarmReciver();
 
     // Handled messages
     public static final int ACTION_NOTIFICATE = 0;
@@ -48,6 +56,8 @@ public final class AppManager {
     private AppManager() {
         handler = new TimerHandler();
         isTimerStarted = new ArrayList<Boolean>();
+        alarms = new HashMap<Integer, Long>();
+        comparator = new MapValueComparator(alarms);
     }
 
     public static synchronized AppManager getInstance() {
@@ -76,6 +86,21 @@ public final class AppManager {
         return isTimerStarted.get(position);
     }
 
+    private void printMap(Map<Integer, Long> map) {
+        for (Map.Entry<Integer, Long> e : map.entrySet()) {
+            Log.d(LOG_TAG, e.getKey() + " : " + e.getValue());
+        }
+    }
+
+    /* Returns position of timer, that has a minimal time to alarm
+     * TreeMap sorted by value
+     */
+    private synchronized int getLeastTimerPosition() {
+        TreeMap<Integer, Long> sorted = new TreeMap<Integer, Long>(comparator);
+        sorted.putAll(alarms);
+        return sorted.firstKey();
+    }
+
     private void doStart(int position) {
         Log.d(LOG_TAG, "doStart() on position " + position);
         if (startedRecipe == null) {
@@ -85,10 +110,16 @@ public final class AppManager {
             }
         }
 
-        /*
-        AlarmReciver alarm = new AlarmReciver();
-        alarm.setAlarm(logoActivity, startedRecipe.getSteps().get(position).getTime());
-        */
+        // if this timer has a minimal time to start
+        // set alarm for this timer
+        long timeUp = startedRecipe.getSteps().get(position).getTime() * 1000
+                + System.currentTimeMillis();
+        alarms.put(position, timeUp);
+        if (getLeastTimerPosition() == position) {
+            alarmReciver.cancelAlarm(logoActivity);
+            alarmReciver.setAlarm(logoActivity, timeUp);
+            Log.d(LOG_TAG, "Set alarm on pos = " + position + " with time=" + timeUp);
+        }
 
         isTimerStarted.set(position, Boolean.TRUE);
         updateActivityControl(position);
@@ -97,17 +128,13 @@ public final class AppManager {
 
     private void doNotification(int position) {
         Log.d(LOG_TAG, "doNotification() on position " + position);
-        /*
-        Context context = (Context) getCurrentActivity();
-        AlarmManager am = (AlarmManager) getCurrentActivity()
-                .getSystemService(Context.ALARM_SERVICE);
-        Intent intent = new Intent(getCurrentActivity(), TimeAlarm.class);
-        PendingIntent pintent = PendingIntent.getBroadcast(
-                context, 0, intent, PendingIntent.FLAG_ONE_SHOT);
-        am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis(), pintent);
-        */
+        notificationRoutine();
     }
 
+    /*
+     * Build notification message
+     * Play audio signal
+     */
     public void notificationRoutine() {
         Context context = getCurrentActivity();
         Notificator.Builder builder = new Notificator.Builder(context);
@@ -121,7 +148,7 @@ public final class AppManager {
                 .setContentIntent(pIntent)
                 .autoCancel(Boolean.TRUE);
 
-        new Notificator(context).doNotification(builder.buildNotification());
+        notificator.doNotification(builder.buildNotification());
         MediaPlayer mp = MediaPlayer.create(currentActivity, R.raw.tone);
         mp.start();
     }
@@ -138,6 +165,20 @@ public final class AppManager {
 
     private void doStop(int position) {
         Log.d(LOG_TAG, "doStop() on position " + position);
+
+        // Find next timer with minimal time to alarm
+        if (getLeastTimerPosition() == position) {
+            alarmReciver.cancelAlarm(logoActivity);
+            alarms.remove(position);
+            if (!alarms.isEmpty()) {
+                Log.d(LOG_TAG, "Current alarm is stopped. Set new Alarm with pos="
+                        + getLeastTimerPosition());
+                alarmReciver.setAlarm(logoActivity, alarms.get(getLeastTimerPosition()));
+            }
+        } else {
+            alarms.remove(position);
+        }
+
         isTimerStarted.set(position, Boolean.FALSE);
         updateActivityControl(position);
         if (!isAnyTimerStarted()) {
@@ -159,6 +200,8 @@ public final class AppManager {
         isTimerStarted.clear();
         currentActivity.setDefault();
         updateActivityControls();
+        alarms.clear();
+        alarmReciver.cancelAlarm(logoActivity);
     }
 
     private void updateActivityControls() {
@@ -206,6 +249,24 @@ public final class AppManager {
 
     }
 
+    class MapValueComparator implements Comparator {
+        private Map base;
+
+        public MapValueComparator(Map base) {
+            this.base = base;
+        }
+
+        public int compare(Object a, Object b) {
+            if ((Long) base.get(a) < (Long) base.get(b)) {
+                return -1;
+            } else if ((Long) base.get(a) == (Long) base.get(b)) {
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+    }
+
     public Handler getHandler() {
         return handler;
     }
@@ -236,5 +297,13 @@ public final class AppManager {
 
     public void setLogoActivity(Activity logoActivity) {
         this.logoActivity = logoActivity;
+    }
+
+    public void setNotificator(Context context) {
+        notificator = new Notificator(context);
+    }
+
+    public void cancelNotification() {
+        notificator.cancel();
     }
 }

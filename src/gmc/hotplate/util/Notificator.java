@@ -32,7 +32,18 @@ public class Notificator {
         Log.d(LOG_TAG, "Event notification: " + lastId);
         nm.notify(lastId, notification);
         notifications.put(lastId, notification);
-        return lastId++;
+        // if increment lastId we put one notification
+        // for one timer. Else we use one notification for all timers
+        return lastId;
+    }
+
+    /* Cancel all notification events
+     *
+     */
+    public void cancel() {
+        for (Map.Entry<Integer, Notification> n : notifications.entrySet()) {
+            nm.cancel(n.getKey());
+        }
     }
 
     public static class Builder {

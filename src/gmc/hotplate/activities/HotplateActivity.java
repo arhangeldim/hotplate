@@ -8,7 +8,6 @@
 package gmc.hotplate.activities;
 
 import gmc.hotplate.R;
-import gmc.hotplate.logic.AppManager;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -28,7 +27,8 @@ public class HotplateActivity extends ParentActivity {
         setContentView(R.layout.main);
         Log.d(LOG_TAG, "Created HotplateActivity");
         Timer timer = new Timer();
-        AppManager.getInstance().setLogoActivity(this);
+        manager.setLogoActivity(this);
+        manager.setNotificator(this);
         timer.schedule(new TimerTask() {
 
             @Override
