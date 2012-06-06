@@ -24,10 +24,9 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.util.Log;
 
-public final class LocalDataManager implements IDataManager {
+public final class LocalDataManager extends DataManager {
 
     private static final String LOG_TAG = LocalDataManager.class.getName();
-
     private Context context;
 
     public LocalDataManager(Context context) {
@@ -55,16 +54,14 @@ public final class LocalDataManager implements IDataManager {
         } catch (IOException e) {
             Log.d(LOG_TAG, "Read json file error: " + e.getMessage());
         }
+        for (Recipe r : recipes) {
+            recipeCache.put(r.getId(), r);
+        }
         return recipes;
     }
 
     @Override
     public Map<Ingredient, Float> getIngredients(long recipeId) {
-        throw new AssertionError("Not implemented yet!");
-    }
-
-    @Override
-    public Recipe getRecipeById(long id) {
         throw new AssertionError("Not implemented yet!");
     }
 

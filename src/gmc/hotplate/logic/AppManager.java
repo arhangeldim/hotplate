@@ -10,8 +10,8 @@ package gmc.hotplate.logic;
 import gmc.hotplate.R;
 import gmc.hotplate.activities.ParentActivity;
 import gmc.hotplate.activities.RecipeDescriptionActivity;
-import gmc.hotplate.activities.RecipesListMenuActivity;
-import gmc.hotplate.entities.Recipe;
+import gmc.hotplate.entities.Ingredient;
+import gmc.hotplate.entities.Step;
 import gmc.hotplate.util.AlarmReciver;
 import gmc.hotplate.util.Notificator;
 
@@ -29,23 +29,30 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Vibrator;
 import android.util.Log;
 
 public final class AppManager {
 
     public static final String LOG_TAG = AppManager.class.getName();
+    public static final long NONE = -1;
+    public static final int VIBRATE_TIME = 300;
     private static AppManager sInstance = null;
     private Handler handler;
     private Activity logoActivity;
     private ParentActivity currentActivity;
-    private Recipe currentRecipe;
-    private Recipe startedRecipe;
+    private long currentRecipeId;
+    private long startedRecipeId = NONE;
+    private long notifyRecipeId = NONE;
+    private boolean isNotify = false;
+    private boolean inDescription = false;
     private List<Boolean> isTimerStarted;
     private Map<Integer, Long> alarms;
     private MapValueComparator comparator;
     private Notificator notificator;
     private AlarmReciver alarmReciver = new AlarmReciver();
-    private IDataManager dataManager;
+    private DataManager dataManager;
+    private boolean intentFromMenu = false;
 
     // Handled messages
     public static final int ACTION_NOTIFICATE = 0;
@@ -77,7 +84,7 @@ public final class AppManager {
     }
 
     public Boolean isCurrentActivityStarted() {
-        return isAnyTimerStarted() && (currentRecipe == startedRecipe);
+        return isAnyTimerStarted() && (isCurrentRecipeStarted());
     }
 
     public Boolean isTimerStarted(int position) {
@@ -93,6 +100,14 @@ public final class AppManager {
         }
     }
 
+    public boolean isInDescription() {
+        return inDescription;
+    }
+
+    public void setInDescription(boolean inDescription) {
+        this.inDescription = inDescription;
+    }
+
     /* Returns position of timer, that has a minimal time to alarm
      * TreeMap sorted by value
      */
@@ -104,16 +119,17 @@ public final class AppManager {
 
     private void doStart(int position) {
         Log.d(LOG_TAG, "doStart() on position " + position);
-        if (startedRecipe == null) {
-            startedRecipe = currentRecipe;
-            for (int i = 0; i < startedRecipe.getSteps().size(); i++) {
+        
+        if (startedRecipeId == NONE) {
+            startedRecipeId = currentRecipeId;
+            for (int i = 0; i < getStartedRecipeSteps().size(); i++) {
                 isTimerStarted.add(Boolean.FALSE);
             }
         }
 
         // if this timer has a minimal time to start
         // set alarm for this timer
-        long timeUp = startedRecipe.getSteps().get(position).getTime() * 1000
+        long timeUp = getStartedRecipeSteps().get(position).getTime() * 1000
                 + System.currentTimeMillis();
         alarms.put(position, timeUp);
         if (getLeastTimerPosition() == position) {
@@ -139,24 +155,32 @@ public final class AppManager {
     public void notificationRoutine() {
         Context context = getCurrentActivity();
         Notificator.Builder builder = new Notificator.Builder(context);
+        notifyRecipeId = startedRecipeId;
+        isNotify = true;
         PendingIntent pIntent = PendingIntent.getActivity(context, 0,
-                new Intent(context, RecipesListMenuActivity.class), 0);
+                new Intent(context, RecipeDescriptionActivity.class), 0);
         builder.setContentText("Шаг завершен")
-                .setContentTitle("Уведомление")
+                .setContentTitle("Hotplate")
                 .setIcon(R.drawable.icon_notification)
-                .setTicker("Шаг завершен")
+                .setTicker("Hotplate уведомление")
                 .setWhen(System.currentTimeMillis())
                 .setContentIntent(pIntent)
+                .setVibrate(Boolean.TRUE)
                 .autoCancel(Boolean.TRUE);
+        if (currentRecipeId != startedRecipeId || !inDescription) {
+            notificator.doNotification(builder.buildNotification());
+        } else {
+            Vibrator v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            v.vibrate(VIBRATE_TIME);
 
-        notificator.doNotification(builder.buildNotification());
+        }
         MediaPlayer mp = MediaPlayer.create(currentActivity, R.raw.tone);
         mp.start();
     }
 
     private void doUpdate(int position, int seconds) {
         Log.v(LOG_TAG, "doUpdate() on position " + position + " " + seconds);
-        if (currentRecipe == startedRecipe) {
+        if (isCurrentRecipeStarted()) {
             Message msg = new Message();
             msg.arg1 = position;
             msg.arg2 = seconds;
@@ -197,7 +221,8 @@ public final class AppManager {
      * default
      */
     private void resetToDefault() {
-        startedRecipe = null;
+        Log.d(LOG_TAG, "Reset to default");
+        startedRecipeId = NONE;
         isTimerStarted.clear();
         currentActivity.setDefault();
         updateActivityControls();
@@ -206,13 +231,14 @@ public final class AppManager {
     }
 
     private void updateActivityControls() {
-        if (currentActivity instanceof RecipeDescriptionActivity) {
+        if (currentActivity instanceof RecipeDescriptionActivity
+                && currentRecipeId != NONE) {
             ((RecipeDescriptionActivity) currentActivity).updateControls();
         }
     }
 
     private void updateActivityControl(int position) {
-        if (currentRecipe == startedRecipe) {
+        if (isCurrentRecipeStarted()) {
             ((RecipeDescriptionActivity) currentActivity)
                     .updateControlState(position);
         }
@@ -280,16 +306,16 @@ public final class AppManager {
         this.currentActivity = currentActivity;
     }
 
-    public Recipe getCurrentRecipe() {
-        return currentRecipe;
+    public long getCurrentRecipeId() {
+        return currentRecipeId;
     }
 
-    public void setCurrentRecipe(Recipe currentRecipe) {
-        this.currentRecipe = currentRecipe;
+    public void setCurrentRecipeId(long currentRecipeId) {
+        this.currentRecipeId = currentRecipeId;
     }
 
-    public Recipe getStartedRecipe() {
-        return startedRecipe;
+    public long getStartedRecipeId() {
+        return startedRecipeId;
     }
 
     public Activity getLogoActivity() {
@@ -308,11 +334,93 @@ public final class AppManager {
         notificator.cancel();
     }
 
-    public IDataManager getDataManager() {
+    public DataManager getDataManager() {
         return dataManager;
     }
 
-    public void setDataManager(IDataManager dataManager) {
+    public void setDataManager(DataManager dataManager) {
         this.dataManager = dataManager;
     }
+
+    public String getCurrentRecipeName() {
+        return getRecipeName(currentRecipeId);
+    }
+
+    public List<Step> getCurrentRecipeSteps() {
+        return getRecipeSteps(currentRecipeId);
+    }
+
+    public List<Ingredient> getCurrentRecipeIngredients() {
+        return getRecipeIngredients(currentRecipeId);
+    }
+
+    public String getStartedRecipeName() {
+        return getRecipeName(startedRecipeId);
+    }
+
+    public List<Step> getStartedRecipeSteps() {
+        return getRecipeSteps(startedRecipeId);
+    }
+
+    public List<Ingredient> getStartedRecipeIngredients() {
+        return getRecipeIngredients(startedRecipeId);
+    }
+
+    private String getRecipeName(long id) {
+        String name = "";
+        if (dataManager != null) {
+            name = dataManager.getRecipeById(id).getName();
+        }
+        return name;
+    }
+
+    private List<Step> getRecipeSteps(long id) {
+        List<Step> steps = null;
+        if (dataManager != null) {
+            steps = dataManager.getRecipeById(id).getSteps();
+        }
+        return steps;
+    }
+
+    private List<Ingredient> getRecipeIngredients(long id) {
+        List<Ingredient> ingredients = null;
+        if (dataManager != null) {
+            ingredients = dataManager.getRecipeById(id).getIngredients();
+        }
+        return ingredients;
+    }
+
+    public boolean isCurrentRecipeStarted() {
+        Log.d(LOG_TAG, "cur=" + currentRecipeId + " started=" + startedRecipeId);
+        return currentRecipeId == startedRecipeId;
+    }
+
+    public boolean isCurrentRecipeNotify() {
+        return currentRecipeId == notifyRecipeId;
+    }
+
+    public boolean isNotify() {
+        return isNotify;
+    }
+
+    public void setNotify(boolean isNotify) {
+        this.isNotify = isNotify;
+    }
+
+    public long getNotifyRecipeId() {
+        return notifyRecipeId;
+    }
+
+    public void setNotifyRecipeId(long notifyRecipeId) {
+        this.notifyRecipeId = notifyRecipeId;
+    }
+
+    public boolean isIntentFromMenu() {
+        return intentFromMenu;
+    }
+
+    public void setIntentFromMenu(boolean intentFromMenu) {
+        this.intentFromMenu = intentFromMenu;
+    }
+
 }

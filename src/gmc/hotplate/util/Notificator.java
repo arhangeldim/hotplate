@@ -95,6 +95,13 @@ public class Notificator {
             return this;
         }
 
+        public Builder setVibrate(Boolean enabled) {
+            if (enabled) {
+                notification.defaults |= Notification.DEFAULT_VIBRATE;
+            }
+            return this;
+        }
+
         public Builder setDefault(int property) {
             notification.defaults = property;
             return this;

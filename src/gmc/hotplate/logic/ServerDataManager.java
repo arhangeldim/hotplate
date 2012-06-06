@@ -26,7 +26,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.util.Log;
 
-public class ServerDataManager implements IDataManager {
+public class ServerDataManager extends DataManager {
 
     public static final String LOG_TAG = ServerDataManager.class.getName();
     public static final String PARAM_KEY_TYPE = "type";
@@ -69,6 +69,9 @@ public class ServerDataManager implements IDataManager {
                 Log.w(LOG_TAG, "No recipes to display");
             }
         }
+        for (Recipe r : recipes) {
+            recipeCache.put(r.getId(), r);
+        }
         return recipes;
     }
 
@@ -83,20 +86,8 @@ public class ServerDataManager implements IDataManager {
     }
 
     @Override
-    public Recipe getRecipeById(long id) {
-        for (Recipe r : recipes) {
-            if (r.getId() == id) {
-                return r;
-            }
-        }
-        return null;
-    }
-
-    @Override
     public void close() {
     }
-
-
 
     @Override
     public List<Recipe> getRecipes(int offset, int limit) {

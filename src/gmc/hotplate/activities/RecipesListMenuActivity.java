@@ -9,8 +9,9 @@ package gmc.hotplate.activities;
 
 import gmc.hotplate.R;
 import gmc.hotplate.entities.Recipe;
+import gmc.hotplate.logic.AppManager;
 import gmc.hotplate.logic.LocalDataManager;
-import gmc.hotplate.logic.IDataManager;
+import gmc.hotplate.logic.DataManager;
 import gmc.hotplate.logic.ServerDataManager;
 
 import java.util.List;
@@ -52,8 +53,9 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
         tvRecipeMenu.setTypeface(robotoLight);
         lvRecipes = (ListView) findViewById(R.id.lvRecipes);
         queryLimit = defaultQueryLimit;
-        IDataManager dm = null;
+        DataManager dm = null;
         List<Recipe> recipes = null;
+        
         if (hasInternetConnection()) {
             Log.d(LOG_TAG, "Network is avaliable.");
             dm = new ServerDataManager(this);
@@ -65,7 +67,7 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
             }
         } else {
             Log.d(LOG_TAG, "Network is not avaliable. Get local data");
-            dm = new ServerDataManager(this);
+            dm = new LocalDataManager(this);
             recipes = dm.getRecipes(queryLimit);
         }
         manager.setDataManager(dm);
@@ -77,7 +79,7 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
     @Override
     protected void onStart() {
         super.onStart();
-        manager.setCurrentRecipe(null);
+        manager.setCurrentRecipeId(AppManager.NONE);
     }
 
     public boolean hasInternetConnection() {
@@ -120,10 +122,11 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
         if (selected instanceof Recipe) {
             Recipe recipe = (Recipe) selected;
             Log.d(LOG_TAG, "Selected recipe name: " + recipe.getName());
-            manager.setCurrentRecipe(recipe);
+            manager.setCurrentRecipeId(recipe.getId());
         }
         Intent intent = new Intent(RecipesListMenuActivity.this,
                 RecipeDescriptionActivity.class);
+        manager.setIntentFromMenu(true);
         startActivity(intent);
     }
 

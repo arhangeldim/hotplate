@@ -12,6 +12,7 @@ import android.app.Activity;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 
 public abstract class ParentActivity extends Activity {
 
@@ -55,7 +56,6 @@ public abstract class ParentActivity extends Activity {
     @Override
     protected void onStop() {
         super.onStop();
-//        Log.d(LOG_TAG, "onStop()");
     }
 
     @Override

@@ -10,7 +10,7 @@
     
     <string name="default_http_timeout">10000</string>
     <string name="default_url">http://hotplatetest.appspot.com/deviceservlet</string>
-    <string name="default_query_limit">10</string>
+    <string name="default_query_limit">-1</string>
     
     <!-- END PROPERTIES -->
     

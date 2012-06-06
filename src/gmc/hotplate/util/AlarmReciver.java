@@ -37,7 +37,7 @@ public class AlarmReciver extends BroadcastReceiver {
         keyguardLock.disableKeyguard();
         */
         wakeLock.acquire();
-        Toast.makeText(context, "Do it!", Toast.LENGTH_SHORT).show();
+        Toast.makeText(context, "Шаг завершен!", Toast.LENGTH_SHORT).show();
         wakeLock.release();
 
     }

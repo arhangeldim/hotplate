@@ -10,6 +10,7 @@ package gmc.hotplate.activities;
 import gmc.hotplate.R;
 import gmc.hotplate.entities.Ingredient;
 import gmc.hotplate.entities.Step;
+import gmc.hotplate.logic.AppManager;
 import gmc.hotplate.services.TimerService;
 import gmc.hotplate.util.Utils;
 
@@ -63,37 +64,42 @@ public class RecipeDescriptionActivity extends ParentActivity {
         tvIngredientAmount = (TextView) findViewById(R.id.tvIngredientAmount);
         tvIngredientAmount.setTypeface(robotoCondensed);
 
+        // When notification is active
+        // If user press notification bar we show Started recipe
+        // If user go to Started recipe notifications clear
+        
+        if (manager.isNotify()
+                && (!manager.isIntentFromMenu()
+                        || (manager.isIntentFromMenu() && manager.isCurrentRecipeNotify()))) {
+            Log.d(LOG_TAG, "Cancel notification.");
+            manager.setNotify(false);
+            manager.cancelNotification();
+            if (manager.getNotifyRecipeId() != AppManager.NONE) {
+                manager.setCurrentRecipeId(manager.getNotifyRecipeId());
+            }
+            manager.setNotifyRecipeId(AppManager.NONE);
+        }
+        if (manager.getCurrentRecipeId() == AppManager.NONE) {
+            return;
+        }
+        
+
+
         lvSteps = (ListView) findViewById(R.id.lvSteps);
         btnCancelAll = (Button) findViewById(R.id.btnCancelAllTimers);
         btnCancelAll.setOnClickListener(new TimerControlListener());
-        tvRecipeName.setText(manager.getCurrentRecipe().getName());
-        List<Step> steps = manager.getCurrentRecipe().getSteps();
+        tvRecipeName.setText(manager.getCurrentRecipeName());
+        List<Step> steps = manager.getCurrentRecipeSteps();
         adapter = new StepListAdapter(steps);
         lvSteps.setAdapter(adapter);
         showIngredients();
+        manager.setIntentFromMenu(false);
     }
-
-    /*
-     * Set activity state
-     * default - no started recipes
-     * active - current recipe is started
-     * inactive - other recipe is started
-     */
-    private void setState() {
-        if (manager.getStartedRecipe() == null) {
-            setDefault();
-        } else if (manager.getStartedRecipe() == manager.getCurrentRecipe()) {
-            setActive();
-        } else {
-            setInactive();
-        }
-    }
-
 
     private void showIngredients() {
         StringBuilder builderIngred = new StringBuilder();
         StringBuilder builderAmount = new StringBuilder();
-        for (Ingredient i : manager.getCurrentRecipe().getIngredients()) {
+        for (Ingredient i : manager.getCurrentRecipeIngredients()) {
             builderIngred.append(i.getName() + "\n");
             Double amount = i.getAmount();
             if (amount.doubleValue() == amount.intValue()) {
@@ -104,6 +110,31 @@ public class RecipeDescriptionActivity extends ParentActivity {
         }
         tvIngredients.setText(builderIngred.toString());
         tvIngredientAmount.setText(builderAmount.toString());
+    }
+    
+    /*
+     * Set activity state
+     * default - no started recipes
+     * active - current recipe is started
+     * inactive - other recipe is started
+     */
+    private void setState() {
+        if (manager.getCurrentRecipeId() == AppManager.NONE) {
+            return;
+        }
+        if (manager.getStartedRecipeId() == AppManager.NONE) {
+            setDefault();
+        } else if (manager.isCurrentRecipeStarted()) {
+            setActive();
+        } else {
+            setInactive();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onStop();
+        manager.setInDescription(false);
     }
 
     public void setBtnCancelAllEnabled(Boolean enabled) {
@@ -126,6 +157,7 @@ public class RecipeDescriptionActivity extends ParentActivity {
         super.onResume();
         manager.setCurrentActivity(this);
         setState();
+        manager.setInDescription(true);
     }
 
     @Override
@@ -271,13 +303,12 @@ public class RecipeDescriptionActivity extends ParentActivity {
         }
         Boolean visible = Boolean.FALSE;
         Boolean running = Boolean.FALSE;
-        if (manager.getCurrentRecipe() == manager.getStartedRecipe()
-                || manager.getStartedRecipe() == null) {
+        if (manager.isCurrentRecipeStarted() || manager.getStartedRecipeId() == AppManager.NONE) {
             running = manager.isTimerStarted(position);
             visible = Boolean.TRUE;
         }
         View v = views.get(position);
-        Step step = manager.getCurrentRecipe().getSteps().get(position);
+        Step step = manager.getCurrentRecipeSteps().get(position);
 
         ImageView iv = (ImageView) v.findViewById(R.id.ivTimerImage);
         TextView tv = (TextView) v.findViewById(R.id.tvElapsedTime);
