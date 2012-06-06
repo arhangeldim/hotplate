@@ -31,6 +31,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RecipesListMenuActivity extends ParentActivity implements OnItemClickListener {
 
@@ -62,11 +63,15 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
             recipes = dm.getRecipes(queryLimit);
             if (recipes == null || recipes.isEmpty()) {
                 Log.d(LOG_TAG, "Network request returns empty set. Try to get local data");
+                Toast.makeText(this, getResources()
+                        .getString(R.string.net_not_available), Toast.LENGTH_LONG).show();
                 dm = new LocalDataManager(this);
                 recipes = dm.getRecipes(queryLimit);
             }
         } else {
             Log.d(LOG_TAG, "Network is not avaliable. Get local data");
+            Toast.makeText(this, getResources()
+                    .getString(R.string.net_not_available), Toast.LENGTH_LONG).show();
             dm = new LocalDataManager(this);
             recipes = dm.getRecipes(queryLimit);
         }

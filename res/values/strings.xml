@@ -9,7 +9,7 @@
     <string name="screen_delay">700</string>
     
     <string name="default_http_timeout">10000</string>
-    <string name="default_url">http://hotplatetest.appspot.com/deviceservlet</string>
+    <string name="default_url">http://hotplate-site.appspot.com/deviceservlet</string>
     <string name="default_query_limit">-1</string>
     
     <!-- END PROPERTIES -->
@@ -22,6 +22,7 @@
     <string name="btn_cancel_all_timers">Отменить все таймеры</string>
     <string name="btn_timer_control_start">Старт</string>
     <string name="btn_timer_control_stop">Стоп</string>
+    <string name="net_not_available">Чтобы получить больше рецептов бесплатно, подключитесь к интернету</string>
     
     <!-- END LABELS -->
     
