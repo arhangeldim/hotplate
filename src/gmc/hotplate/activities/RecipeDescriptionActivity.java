@@ -24,6 +24,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -44,6 +45,7 @@ public class RecipeDescriptionActivity extends ParentActivity {
     private StepListAdapter adapter;
     private TextView tvRecipeName;
     private TextView tvIngredients;
+    private TextView tvIngredientAmount;
     private Button btnCancelAll;
     private Map<Integer, View> views = new HashMap<Integer, View>();
 
@@ -56,6 +58,11 @@ public class RecipeDescriptionActivity extends ParentActivity {
         tvRecipeName = (TextView) findViewById(R.id.tvRecipeName);
         tvRecipeName.setTypeface(robotoCondensed);
         tvIngredients = (TextView) findViewById(R.id.tvRecipeIngredients);
+        tvIngredients.setTypeface(robotoLight);
+
+        tvIngredientAmount = (TextView) findViewById(R.id.tvIngredientAmount);
+        tvIngredientAmount.setTypeface(robotoCondensed);
+
         lvSteps = (ListView) findViewById(R.id.lvSteps);
         btnCancelAll = (Button) findViewById(R.id.btnCancelAllTimers);
         btnCancelAll.setOnClickListener(new TimerControlListener());
@@ -84,20 +91,28 @@ public class RecipeDescriptionActivity extends ParentActivity {
 
 
     private void showIngredients() {
-        StringBuilder builder = new StringBuilder();
-        Map<Ingredient, Float> ingredients = manager.getCurrentRecipe().getIngredients();
-        for (Map.Entry<Ingredient, Float> entry : ingredients.entrySet()) {
-            builder.append(entry.getKey().getName() + "     -   " + entry.getValue() + "\n");
+        StringBuilder builderIngred = new StringBuilder();
+        StringBuilder builderAmount = new StringBuilder();
+        for (Ingredient i : manager.getCurrentRecipe().getIngredients()) {
+            builderIngred.append(i.getName() + "\n");
+            Double amount = i.getAmount();
+            if (amount.doubleValue() == amount.intValue()) {
+                builderAmount.append(amount.intValue() + " " + i.getType() + "\n");
+            } else {
+                builderAmount.append(amount + " " + i.getType() + "\n");
+            }
         }
-        tvIngredients.setText(builder.toString());
+        tvIngredients.setText(builderIngred.toString());
+        tvIngredientAmount.setText(builderAmount.toString());
     }
 
     public void setBtnCancelAllEnabled(Boolean enabled) {
         btnCancelAll.setEnabled(enabled);
+        Log.d(LOG_TAG, "set button enabled = " + enabled);
         if (enabled) {
             btnCancelAll.setTextColor(getResources().getColor(R.color.cblack));
         } else {
-            btnCancelAll.setTextColor(getResources().getColor(R.color.palette_gray));
+            btnCancelAll.setTextColor(getResources().getColor(R.color.inactive_button));
         }
     }
 
@@ -298,7 +313,7 @@ public class RecipeDescriptionActivity extends ParentActivity {
     @Override
     public void setDefault() {
         btnCancelAll.setVisibility(View.VISIBLE);
-        btnCancelAll.setEnabled(Boolean.FALSE);
+        setBtnCancelAllEnabled(Boolean.FALSE);
     }
 
      /* Active state:
@@ -307,7 +322,7 @@ public class RecipeDescriptionActivity extends ParentActivity {
     @Override
     public void setActive() {
         btnCancelAll.setVisibility(View.VISIBLE);
-        btnCancelAll.setEnabled(Boolean.TRUE);
+        setBtnCancelAllEnabled(Boolean.TRUE);
     }
 
     @Override

@@ -9,13 +9,16 @@ package gmc.hotplate.activities;
 
 import gmc.hotplate.R;
 import gmc.hotplate.entities.Recipe;
-import gmc.hotplate.logic.DatabaseManager;
+import gmc.hotplate.logic.LocalDataManager;
 import gmc.hotplate.logic.IDataManager;
+import gmc.hotplate.logic.ServerDataManager;
 
 import java.util.List;
 
+import android.content.Context;
 import android.content.Intent;
-import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
@@ -31,10 +34,9 @@ import android.widget.TextView;
 public class RecipesListMenuActivity extends ParentActivity implements OnItemClickListener {
 
     private static final String LOG_TAG = RecipesListMenuActivity.class.getName();
-    public static final int QUERY_LIMIT = 10;
-    private IDataManager dbManager;
+    private int defaultQueryLimit;
+    private int queryLimit;
     private ListView lvRecipes;
-    
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,14 +45,30 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.recipe_list);
         Log.d(LOG_TAG, "Created RecipesListMenyActivity");
-        dbManager = DatabaseManager.getInstance(this);
+        defaultQueryLimit = Integer.parseInt(getResources()
+                .getString(R.string.default_query_limit));
+
         TextView tvRecipeMenu = (TextView) findViewById(R.id.tvRecipeMenu);
         tvRecipeMenu.setTypeface(robotoLight);
-        
-        
         lvRecipes = (ListView) findViewById(R.id.lvRecipes);
-
-        List<Recipe> recipes = dbManager.getRecipes(QUERY_LIMIT);
+        queryLimit = defaultQueryLimit;
+        IDataManager dm = null;
+        List<Recipe> recipes = null;
+        if (hasInternetConnection()) {
+            Log.d(LOG_TAG, "Network is avaliable.");
+            dm = new ServerDataManager(this);
+            recipes = dm.getRecipes(queryLimit);
+            if (recipes == null || recipes.isEmpty()) {
+                Log.d(LOG_TAG, "Network request returns empty set. Try to get local data");
+                dm = new LocalDataManager(this);
+                recipes = dm.getRecipes(queryLimit);
+            }
+        } else {
+            Log.d(LOG_TAG, "Network is not avaliable. Get local data");
+            dm = new ServerDataManager(this);
+            recipes = dm.getRecipes(queryLimit);
+        }
+        manager.setDataManager(dm);
         RecipeListAdapter adapter = new RecipeListAdapter(recipes);
         lvRecipes.setAdapter(adapter);
         lvRecipes.setOnItemClickListener(this);
@@ -62,7 +80,32 @@ public class RecipesListMenuActivity extends ParentActivity implements OnItemCli
         manager.setCurrentRecipe(null);
     }
 
-
+    public boolean hasInternetConnection() {
+        ConnectivityManager cm =
+                (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (cm == null) {
+            return false;
+        }
+        NetworkInfo[] netInfo = cm.getAllNetworkInfo();
+        if (netInfo == null) {
+            return false;
+        }
+        for (NetworkInfo ni : netInfo) {
+            if (ni.getTypeName().equalsIgnoreCase("WIFI")) {
+                if (ni.isConnected()) {
+                    Log.d(this.toString(), "wifi conncetion found");
+                    return true;
+                }
+            }
+            if (ni.getTypeName().equalsIgnoreCase("MOBILE")) {
+                if (ni.isConnected()) {
+                    Log.d(this.toString(), "mobile connection found");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
     @Override
     public void onBackPressed() {

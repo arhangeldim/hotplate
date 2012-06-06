@@ -49,4 +49,9 @@ public class Step {
         this.time = time;
     }
 
+    @Override
+    public String toString() {
+        return "(" + id + ", " + description + ", " + time + ")";
+    }
+
 }

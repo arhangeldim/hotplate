@@ -1,3 +1,10 @@
+/* Copyright (c) 2012 Hotplate developers. All rights reserved.
+ * Use of this source code is governed by a BSD-style license that can be
+ * found in the LICENSE file.
+ *
+ * project: Hotplate
+ */
+
 package gmc.hotplate.util;
 
 public final class Utils {

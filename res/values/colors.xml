@@ -9,6 +9,7 @@
     <color name="cblack">#ff000000</color>
     <color name="light_gray">#ff333333</color>
     <color name="palette_gray">#ff7e7e7e</color>
+    <color name="inactive_button">#ffaaaaaa</color>
     <color name="light_orange">#fff69233</color>
     
     

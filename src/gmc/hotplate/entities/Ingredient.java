@@ -9,28 +9,18 @@ package gmc.hotplate.entities;
 
 public class Ingredient {
 
-    private int id;
     private String name;
-    private int type;
-    private String imagePath;
+    private double amount;
+    private String type;
 
     public Ingredient() {
 
     }
 
-    public Ingredient(int id, String name, int type, String imagePath) {
-        this.id = id;
+    public Ingredient(String name, double amount, String type) {
         this.name = name;
+        this.amount = amount;
         this.type = type;
-        this.imagePath = imagePath;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -41,20 +31,25 @@ public class Ingredient {
         this.name = name;
     }
 
-    public int getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(int type) {
+    public void setType(String type) {
         this.type = type;
     }
 
-    public String getImagePath() {
-        return imagePath;
+    public double getAmount() {
+        return amount;
     }
 
-    public void setImagePath(String imagePath) {
-        this.imagePath = imagePath;
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    @Override
+    public String toString() {
+        return "(" + name + ", " + amount + ", " + type + ")";
     }
 
 }

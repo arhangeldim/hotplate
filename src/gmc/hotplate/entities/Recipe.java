@@ -12,21 +12,21 @@ import java.util.Map;
 
 public class Recipe {
 
-    private int id;
+    private long id;
     private String name;
     private String description;
     private int personCount;
     private List<Step> steps;
-    private Map<Ingredient, Float> ingredients;
-    private List<Category> categories;
+    private Map<Ingredient, Float> oldFormatIngredients;
+    private List<Ingredient> ingredients;
+    private List<String> categories;
 
 
     public Recipe() {
 
     }
 
-    public Recipe(int id, int categoryId, String name, String description, int personCount,
-            List<Step> steps) {
+    public Recipe(long id, String name, String description, int personCount, List<Step> steps) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -34,7 +34,7 @@ public class Recipe {
         this.steps = steps;
     }
 
-    public int getId() {
+    public long getId() {
         return id;
     }
 
@@ -74,25 +74,44 @@ public class Recipe {
         this.steps = steps;
     }
 
-    public Map<Ingredient, Float> getIngredients() {
-        return ingredients;
+    public Map<Ingredient, Float> getOldFormatIngredients() {
+        return oldFormatIngredients;
     }
 
-    public void setIngredients(Map<Ingredient, Float> ingredients) {
-        this.ingredients = ingredients;
+    public void setOldFormatIngredients(Map<Ingredient, Float> ingredients) {
+        this.oldFormatIngredients = ingredients;
     }
 
-    public List<Category> getCategories() {
+    public List<String> getCategories() {
         return categories;
     }
 
-    public void setCategories(List<Category> categories) {
+    public void setCategories(List<String> categories) {
         this.categories = categories;
+    }
+
+    public List<Ingredient> getIngredients() {
+        return ingredients;
+    }
+
+    public void setIngredients(List<Ingredient> ingredients) {
+        this.ingredients = ingredients;
     }
 
     @Override
     public String toString() {
-        return name;
+        StringBuilder builder = new StringBuilder();
+        builder.append("id = " + id + "\n")
+                .append("name = " + name + "\n")
+                .append("description = " + description + "\n")
+                .append("person count = " + personCount + "\n");
+        for (int i = 0; i < steps.size(); i++) {
+            builder.append("\t" + steps.get(i).toString() + "\n");
+        }
+        for (int i = 0; i < ingredients.size(); i++) {
+            builder.append("\t" + ingredients.get(i).toString() + "\n");
+        }
+        return builder.toString();
     }
 
 }

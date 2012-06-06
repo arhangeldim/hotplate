@@ -17,11 +17,13 @@ public interface IDataManager {
 
     List<Recipe> getRecipes(int limit);
 
+    List<Recipe> getRecipes(int offset, int limit);
+
     List<Ingredient> getProductsList(int type, int limit);
 
-    Map<Ingredient, Float> getIngredients(int recipeId);
+    Map<Ingredient, Float> getIngredients(long recipeId);
 
-    Recipe getRecipeById(int id);
+    Recipe getRecipeById(long id);
 
     void close();
 

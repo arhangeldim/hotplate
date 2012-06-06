@@ -45,6 +45,7 @@ public final class AppManager {
     private MapValueComparator comparator;
     private Notificator notificator;
     private AlarmReciver alarmReciver = new AlarmReciver();
+    private IDataManager dataManager;
 
     // Handled messages
     public static final int ACTION_NOTIFICATE = 0;
@@ -305,5 +306,13 @@ public final class AppManager {
 
     public void cancelNotification() {
         notificator.cancel();
+    }
+
+    public IDataManager getDataManager() {
+        return dataManager;
+    }
+
+    public void setDataManager(IDataManager dataManager) {
+        this.dataManager = dataManager;
     }
 }
